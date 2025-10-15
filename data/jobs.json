@@ -179,5 +179,24 @@
     "progress": 100,
     "error": null,
     "output_file": "output/0561a4ea-5ebf-4997-b25f-4c0d0955939f_video.mp4"
+  },
+  "89c6137b-d6c0-47ce-9d9e-6baf28ed5900": {
+    "job_id": "89c6137b-d6c0-47ce-9d9e-6baf28ed5900",
+    "status": "failed",
+    "script": "Imagine this,\r\nyou\u2019re smiling in photos, but inside, you feel hollow.\r\nYou keep achieving, chasing love, money, approval,\r\nbut no matter what you get, it never fills the emptiness.\r\n\r\nYou scroll, laugh, and act like everything\u2019s fine,\r\nbut when the noise stops, you feel the weight of it all.\r\nThe guilt, the fear, the questions you don\u2019t say out loud.\r\nSomething deep inside you knows,\r\nyou were made for more than this.\r\n\r\nThat missing piece isn\u2019t success, or people, or pleasure,\r\nit\u2019s a Person.\r\nThe One who made you.\r\nThe One who\u2019s been calling you back while you\u2019ve been running away.\r\nAnd even when you ignored Him,\r\nHe never stopped reaching for you.\r\n\r\nHis name is Jesus.\r\nHe saw every mistake, every secret, every regret,\r\nand still chose the cross for you.\r\nHe took your punishment,\r\ndied the death you deserved,\r\nand three days later, He rose again\u2014alive.\r\nDeath couldn\u2019t hold Him, and sin couldn\u2019t stop Him.\r\n\r\nAnd now, He\u2019s calling your name.\r\nNot to condemn you, but to free you.\r\nTo take the weight off your shoulders,\r\nand give you the life you were created for.\r\n\r\nYou don\u2019t have to earn it.\r\nYou don\u2019t have to be perfect.\r\nYou just have to come.\r\n\u201cEveryone who calls on the name of the Lord will be saved.\u201d (Romans 10:13)\r\n\r\nThis isn\u2019t religion.\r\nThis is rescue.\r\nThis is love.\r\nThis is the moment everything can change\u2014\r\nstarting right now.",
+    "options": {
+      "use_tts": true,
+      "voice": "male-confident",
+      "add_captions": true,
+      "caption_style": "uppercase",
+      "add_music": true,
+      "mood": "professional",
+      "aspect_ratio": "9:16"
+    },
+    "created_at": "2025-10-15T05:05:10.338129",
+    "updated_at": "2025-10-15T05:06:41.143974",
+    "progress": 10,
+    "error": "Video generation failed: name 'media_files' is not defined",
+    "output_file": null
   }
 }

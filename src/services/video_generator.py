@@ -184,19 +184,19 @@ class VideoGenerator:
         - Proper aspect ratio cropping (no distortion!)
         - Variable playback speed based on content
         - AI-selected transitions
-        
+
         Args:
             media_files_with_metadata: List of (media_path, metadata) tuples
         """
         from concurrent.futures import ThreadPoolExecutor
         import asyncio
-        
+
         print(f"🎬 Processing {len(media_files_with_metadata)} clips in PARALLEL (using all M4 cores)...")
-        
+
         # Process clips in parallel for 3x speed boost!
         with ThreadPoolExecutor(max_workers=8) as executor:
             loop = asyncio.get_event_loop()
-            
+
             tasks = []
             for i, (scene, (media_path, metadata)) in enumerate(zip(scenes, media_files_with_metadata)):
                 task = loop.run_in_executor(
@@ -208,9 +208,9 @@ class VideoGenerator:
                     i
                 )
                 tasks.append(task)
-            
+
             clips = await asyncio.gather(*tasks)
-        
+
         print(f"✅ All clips processed in parallel!")
         return clips
 
@@ -230,7 +230,7 @@ class VideoGenerator:
         if media_path.suffix.lower() in ['.mp4', '.mov', '.avi']:
             # Video file
             clip = VideoFileClip(str(media_path))
-            
+
             # Apply playback speed BEFORE duration adjustment
             if playback_speed != 1.0:
                 # Speed up/slow down the video
@@ -243,11 +243,11 @@ class VideoGenerator:
                 elif playback_speed > 1.0:
                     # Speed up - reduce duration
                     clip = clip.with_fps(int(clip.fps * playback_speed))
-            
+
             # Take only the needed duration
             clip_duration = min(duration / playback_speed, clip.duration)
             clip = clip.subclipped(0, clip_duration)
-            
+
             if clip.duration < duration:
                 # Loop if video is too short
                 loops = int(duration / clip.duration) + 1
@@ -259,28 +259,28 @@ class VideoGenerator:
 
         # SMART CROP for aspect ratio (no distortion!)
         clip = self._smart_crop_and_resize(clip)
-        
+
         # Apply AI-selected transition
         clip = self._apply_smart_transition(clip, transition_out)
 
         return clip
-    
+
     def _smart_crop_and_resize(self, clip):
         """
         Crop media to fit aspect ratio WITHOUT distortion.
-        
+
         Intelligently crops sides/top/bottom to maintain aspect ratio.
         """
         target_w, target_h = self.resolution
         clip_w, clip_h = clip.size
-        
+
         target_aspect = target_w / target_h
         clip_aspect = clip_w / clip_h
-        
+
         if abs(clip_aspect - target_aspect) < 0.01:
             # Already correct aspect ratio, just resize
             return clip.with_effects([Resize(self.resolution)])
-        
+
         if clip_aspect > target_aspect:
             # Clip is WIDER than target - crop left/right sides
             new_w = int(clip_h * target_aspect)
@@ -299,9 +299,9 @@ class VideoGenerator:
                 Crop(y1=y1, height=new_h),
                 Resize(self.resolution)
             ])
-        
+
         return clip
-    
+
     def _apply_smart_transition(self, clip, transition_type: str):
         """Apply AI-selected transition to clip."""
         if transition_type == "crossfade":

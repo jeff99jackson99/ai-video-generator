@@ -112,6 +112,16 @@ async def root():
     return {"message": "AI Video Generator API", "version": "0.1.0"}
 
 
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve favicon to avoid 404 errors."""
+    favicon_file = static_dir / "favicon.ico"
+    if favicon_file.exists():
+        return FileResponse(favicon_file)
+    # Return empty response if no favicon
+    return {"status": "ok"}
+
+
 @app.get("/healthz")
 async def health_check():
     """Health check endpoint."""
@@ -254,7 +264,7 @@ async def save_settings(settings: SettingsRequest):
             Config.PIXABAY_API_KEY = settings.pixabay_api_key
 
         # Reinitialize services with new keys
-        global script_enhancer, media_fetcher, music_selector
+        global script_enhancer, media_fetcher, music_selector, smart_media_selector
         script_enhancer = ScriptEnhancer(
             openai_api_key=Config.OPENAI_API_KEY,
             gemini_api_key=Config.GEMINI_API_KEY,
@@ -269,6 +279,11 @@ async def save_settings(settings: SettingsRequest):
         music_selector = MusicSelector(
             pixabay_key=Config.PIXABAY_API_KEY,
             music_dir=Config.DATA_DIR / "music"
+        )
+        smart_media_selector = SmartMediaSelector(
+            openai_api_key=Config.OPENAI_API_KEY,
+            pexels_key=Config.PEXELS_API_KEY,
+            cache_dir=Config.MEDIA_DIR
         )
 
         return {"message": "Settings saved successfully"}

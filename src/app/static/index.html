@@ -385,7 +385,7 @@
                         <p style="font-size: 12px; color: #666; margin-top: 5px;">
                             💡 UPPERCASE is great for shorts and TikTok!
                         </p>
-                        
+
                         <!-- LIVE CAPTION PREVIEW -->
                         <div id="captionPreview" class="caption-preview caption-modern" style="
                             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -499,7 +499,7 @@
         function updateCaptionPreview() {
             const style = document.getElementById('captionStyle').value;
             const preview = document.getElementById('captionPreview');
-            
+
             // Style configurations matching MoviePy exactly
             const styles = {
                 'modern': {
@@ -583,9 +583,9 @@
                     fontWeight: 'bold'
                 }
             };
-            
+
             const styleConfig = styles[style] || styles['modern'];
-            
+
             preview.textContent = styleConfig.text;
             preview.style.color = styleConfig.color;
             preview.style.fontSize = styleConfig.fontSize;
@@ -593,10 +593,10 @@
             preview.style.textShadow = styleConfig.textShadow;
             preview.style.fontWeight = styleConfig.fontWeight;
         }
-        
+
         // Update preview when caption style changes
         document.getElementById('captionStyle').addEventListener('change', updateCaptionPreview);
-        
+
         // Initialize preview on page load
         updateCaptionPreview();
 
