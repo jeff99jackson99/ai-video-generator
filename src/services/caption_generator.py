@@ -56,16 +56,33 @@ class CaptionGenerator:
             scene_end = scene.get('audio_end', (i + 1) * 5)
             scene_duration = scene_end - scene_start
 
-            # Create word-by-word captions for more engaging effect
+            # Create phrase-based captions (2-4 words) for better readability
+            # Word-by-word is too fast and hard to read
             if words:
-                word_duration = scene_duration / len(words)
-
-                for j, word in enumerate(words):
+                # Group words into readable phrases (2-4 words each)
+                phrases = []
+                current_phrase = []
+                
+                for word in words:
+                    current_phrase.append(word)
+                    # Create phrase every 2-4 words or at punctuation
+                    if len(current_phrase) >= 3 or word.endswith((',', '.', '!', '?')):
+                        phrases.append(' '.join(current_phrase))
+                        current_phrase = []
+                
+                # Add remaining words
+                if current_phrase:
+                    phrases.append(' '.join(current_phrase))
+                
+                # Calculate timing for phrases (better readability)
+                phrase_duration = scene_duration / len(phrases) if phrases else scene_duration
+                
+                for j, phrase in enumerate(phrases):
                     caption = {
-                        'text': word,
-                        'start_time': scene_start + (j * word_duration),
-                        'end_time': scene_start + ((j + 1) * word_duration),
-                        'style': 'word'  # word, sentence, or full
+                        'text': phrase,
+                        'start_time': scene_start + (j * phrase_duration),
+                        'end_time': scene_start + ((j + 1) * phrase_duration),
+                        'style': 'phrase'  # Phrase-based for better readability
                     }
                     captions.append(caption)
 

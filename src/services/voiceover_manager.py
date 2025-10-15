@@ -34,23 +34,29 @@ class VoiceoverManager:
         voice: str = "default",
         use_gtts: bool = True
     ) -> Path:
-        """Generate text-to-speech audio with proper voice selection."""
+        """Generate text-to-speech with natural-sounding voices."""
         filename = f"{job_id}_tts.mp3"
         file_path = self.storage_dir / filename
         
-        # Try Coqui TTS first for better quality and voice control
+        # Try Edge TTS first - FREE Microsoft voices, very natural!
+        try:
+            print(f"🎙️ Generating voiceover with Edge TTS (Microsoft) - Natural {voice} voice...")
+            return await self._generate_edge_tts(text, file_path, voice)
+        except Exception as e:
+            print(f"Edge TTS error: {e}, trying Coqui TTS")
+        
+        # Try Coqui TTS second
         try:
             print(f"🎙️ Generating voiceover with Coqui TTS (voice: {voice})...")
             return await self._generate_coqui_tts(text, file_path, voice)
         except Exception as e:
             print(f"Coqui TTS not available: {e}, using gTTS")
         
-        # Fallback to gTTS
+        # Fallback to gTTS (robotic but reliable)
         if use_gtts:
             try:
                 from gtts import gTTS
-                # gTTS doesn't support voice selection well, but works
-                print(f"🎙️ Generating voiceover with gTTS...")
+                print(f"🎙️ Generating voiceover with gTTS (robotic fallback)...")
                 tts = gTTS(text=text, lang='en', slow=False)
                 tts.save(str(file_path))
                 print(f"✅ Voiceover generated with gTTS")
@@ -63,9 +69,44 @@ class VoiceoverManager:
             return await self._generate_coqui_tts(text, file_path, voice)
         except Exception as e:
             print(f"Coqui TTS error: {e}")
-            # If both fail, create silent audio as fallback
-            return await self._create_silent_audio(file_path, duration=5)
-
+        # If all fail, create silent audio as fallback
+        return await self._create_silent_audio(file_path, duration=5)
+    
+    async def _generate_edge_tts(
+        self,
+        text: str,
+        output_path: Path,
+        voice: str
+    ) -> Path:
+        """
+        Generate TTS using Microsoft Edge TTS (FREE, very natural voices).
+        
+        Edge TTS voices are 100% free and sound like real people!
+        """
+        try:
+            import edge_tts
+            
+            # Select natural voice based on preference
+            voice_map = {
+                "male": "en-US-GuyNeural",  # Natural American male
+                "female": "en-US-AriaNeural",  # Natural American female
+                "default": "en-US-GuyNeural"
+            }
+            
+            edge_voice = voice_map.get(voice, voice_map["male"])
+            
+            print(f"🎙️ Using Microsoft Edge TTS voice: {edge_voice} (sounds like real person!)")
+            
+            # Generate speech
+            communicate = edge_tts.Communicate(text, edge_voice)
+            await communicate.save(str(output_path))
+            
+            print(f"✅ Natural voiceover generated with Edge TTS!")
+            return output_path
+            
+        except Exception as e:
+            raise Exception(f"Edge TTS generation failed: {e}")
+    
     async def _generate_coqui_tts(
         self,
         text: str,

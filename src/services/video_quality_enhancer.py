@@ -7,11 +7,11 @@ import httpx
 
 class VideoQualityEnhancer:
     """Uses AI to review and enhance video quality."""
-    
+
     def __init__(self, openai_api_key: Optional[str] = None):
         """Initialize quality enhancer."""
         self.openai_api_key = openai_api_key
-    
+
     async def analyze_video_quality(
         self,
         video_path: Path,
@@ -21,12 +21,12 @@ class VideoQualityEnhancer:
     ) -> Dict[str, Any]:
         """
         Use AI to analyze video quality and suggest improvements.
-        
+
         Returns suggestions for the next generation iteration.
         """
         if not self.openai_api_key:
             return {"suggestions": [], "quality_score": 7}
-        
+
         try:
             # Create analysis prompt
             analysis_prompt = f"""Analyze this video generation and suggest improvements:
@@ -56,7 +56,7 @@ Return JSON:
     "next_iteration_tips": "Focus on...",
     "overall_assessment": "Good start, but..."
 }}"""
-            
+
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     "https://api.openai.com/v1/chat/completions",
@@ -84,22 +84,22 @@ Return JSON:
                 )
                 response.raise_for_status()
                 data = response.json()
-                
+
                 import json
                 analysis = json.loads(data['choices'][0]['message']['content'])
-                
+
                 print(f"🎯 AI Quality Analysis Complete! Score: {analysis.get('quality_score', 0)}/10")
                 return analysis
-                
+
         except Exception as e:
             print(f"Quality analysis error: {e}")
             return {"suggestions": [], "quality_score": 7}
-    
+
     def should_regenerate(self, analysis: Dict[str, Any], threshold: int = 7) -> bool:
         """Determine if video should be regenerated based on quality score."""
         score = analysis.get('quality_score', 10)
         return score < threshold
-    
+
     def apply_improvements(
         self,
         original_script: str,
@@ -108,7 +108,7 @@ Return JSON:
     ) -> Dict[str, Any]:
         """
         Apply AI suggestions to improve next generation.
-        
+
         Returns enhanced parameters for regeneration.
         """
         improvements = {
@@ -117,6 +117,5 @@ Return JSON:
             "caption_style": analysis.get('caption_style', 'modern'),
             "suggestions": analysis.get('next_iteration_tips', '')
         }
-        
-        return improvements
 
+        return improvements

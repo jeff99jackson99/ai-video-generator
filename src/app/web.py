@@ -326,22 +326,26 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=5)
         print(f"🤖 Starting AI script enhancement...")
         job_manager.update_job(job_id, progress=10)
-        
+
         enhanced_data = await script_enhancer.enhance_script(script)
         scenes = enhanced_data['scenes']
         keywords = enhanced_data['keywords']
         mood = options.get('mood', enhanced_data.get('mood', 'professional'))
-        
+
         job_manager.update_job(job_id, progress=15)
         print(f"✅ Script enhanced! {len(scenes)} scenes, {len(keywords)} keywords")
-        
-        # Step 2: Fetch media with progress updates
+
+        # Step 2: Fetch media with progress updates (mix of photos and videos!)
         job_manager.update_job(job_id, progress=20)
-        print(f"📸 Fetching {len(scenes)} images from Pexels...")
+        print(f"📸 Fetching {len(scenes)} media files (photos + video clips) from Pexels...")
         job_manager.update_job(job_id, progress=25)
         
-        media_files = await media_fetcher.search_and_download(keywords, count=len(scenes))
-        
+        media_files = await media_fetcher.search_and_download(
+            keywords,
+            count=len(scenes),
+            media_type="mixed"  # Get both photos AND short video clips for dynamic content
+        )
+
         job_manager.update_job(job_id, progress=35)
         print(f"✅ {len(media_files)} images downloaded!")
 
@@ -352,24 +356,24 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=40)
         print(f"🎙️ Generating voiceover...")
         voiceover_path = Config.VOICEOVER_DIR / f"{job_id}_recording.mp3"
-        
+
         if not voiceover_path.exists():
             # Generate TTS
             full_script = enhanced_data['enhanced_script']
             job_manager.update_job(job_id, progress=45)
-            
+
             voiceover_path = await voiceover_manager.generate_tts(
                 full_script,
                 job_id,
                 voice=options.get('voice', 'default')
             )
             job_manager.update_job(job_id, progress=50)
-        
+
         # Process audio
         print(f"🔊 Processing audio...")
         voiceover_path = await voiceover_manager.process_audio(voiceover_path)
         job_manager.update_job(job_id, progress=52)
-        
+
         # Sync scenes with audio timing
         scenes = await voiceover_manager.sync_audio_to_script(voiceover_path, scenes)
         job_manager.update_job(job_id, progress=54)
@@ -393,7 +397,7 @@ async def process_video_job(job_id: str):
             )
             job_manager.update_job(job_id, progress=65)
             print(f"✅ {len(captions)} captions created!")
-        
+
         # Step 5: Get background music
         job_manager.update_job(job_id, progress=68)
         print(f"🎵 Selecting background music...")
@@ -415,7 +419,7 @@ async def process_video_job(job_id: str):
         # Step 6: Generate video with detailed progress
         job_manager.update_job(job_id, progress=75)
         print(f"🎬 Starting video assembly...")
-        
+
         def update_progress(progress: int):
             """Real-time progress callback."""
             job_manager.update_job(job_id, progress=progress)
@@ -435,24 +439,24 @@ async def process_video_job(job_id: str):
         if Config.OPENAI_API_KEY:
             job_manager.update_job(job_id, progress=98)
             print(f"🤖 Running AI quality analysis...")
-            
+
             analysis = await quality_enhancer.analyze_video_quality(
                 output_path,
                 script,
                 scenes,
                 keywords
             )
-            
+
             # Log suggestions for future improvements
             if analysis.get('suggestions'):
                 print(f"💡 AI Suggestions: {analysis.get('overall_assessment', '')}")
                 print(f"   Quality Score: {analysis.get('quality_score', 0)}/10")
-                
+
                 # Store suggestions in job metadata for user reference
                 if analysis.get('quality_score', 10) < 8:
                     print(f"💡 AI recommends improvements for next video:")
                     print(f"   {analysis.get('next_iteration_tips', 'Try different keywords')}")
-        
+
         # Mark as completed
         job_manager.update_job(
             job_id,
@@ -460,7 +464,7 @@ async def process_video_job(job_id: str):
             progress=100,
             output_file=str(output_path)
         )
-        
+
         print(f"✅ VIDEO COMPLETE! Generated: {output_path.name}")
 
     except Exception as e:

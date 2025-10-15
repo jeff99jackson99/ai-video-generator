@@ -29,40 +29,72 @@ class MediaFetcher:
         self,
         keywords: List[str],
         count: int = 5,
-        media_type: str = "photos"  # "photos" or "videos"
+        media_type: str = "mixed"  # "photos", "videos", or "mixed"
     ) -> List[Path]:
-        """Search for and download media based on keywords."""
+        """
+        Search for and download media based on keywords.
+        
+        Args:
+            keywords: List of search keywords
+            count: Number of media files to fetch
+            media_type: "photos", "videos", or "mixed" (mix of both)
+        
+        Returns:
+            List of downloaded media file paths
+        """
         all_media = []
-
-        # Try each API source
-        tasks = []
-        if self.pexels_key:
-            tasks.append(self._search_pexels(keywords, count, media_type))
-        if self.unsplash_key and media_type == "photos":
-            tasks.append(self._search_unsplash(keywords, count))
-        if self.pixabay_key:
-            tasks.append(self._search_pixabay(keywords, count, media_type))
-
-        if not tasks:
-            # No API keys, use fallback
-            return await self._fallback_media(keywords, count, media_type)
-
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        for result in results:
-            if isinstance(result, list):
-                all_media.extend(result)
-
+        
+        # For mixed, get both photos and short video clips
+        if media_type == "mixed" and self.pexels_key:
+            # Get mix: 60% photos, 40% videos for dynamic content
+            photo_count = int(count * 0.6) or 1
+            video_count = count - photo_count
+            
+            print(f"📸 Fetching {photo_count} photos and 🎥 {video_count} video clips from Pexels...")
+            
+            tasks = [
+                self._search_pexels(keywords, photo_count, "photos"),
+                self._search_pexels(keywords, video_count, "videos")
+            ]
+            
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for result in results:
+                if isinstance(result, list):
+                    all_media.extend(result)
+        
+        else:
+            # Regular single-type search
+            tasks = []
+            if self.pexels_key:
+                tasks.append(self._search_pexels(keywords, count, media_type))
+            if self.unsplash_key and media_type == "photos":
+                tasks.append(self._search_unsplash(keywords, count))
+            if self.pixabay_key:
+                tasks.append(self._search_pixabay(keywords, count, media_type))
+            
+            if not tasks:
+                # No API keys, use fallback
+                return await self._fallback_media(keywords, count, media_type)
+            
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            for result in results:
+                if isinstance(result, list):
+                    all_media.extend(result)
+        
         # Download media files
         downloaded = []
-        for media_url in all_media[:count]:
+        for media_url in all_media[:count * 2]:  # Get extra in case some fail
             try:
                 file_path = await self._download_file(media_url)
                 if file_path:
                     downloaded.append(file_path)
+                    if len(downloaded) >= count:
+                        break
             except Exception as e:
                 print(f"Error downloading {media_url}: {e}")
-
+        
+        print(f"✅ Downloaded {len(downloaded)} media files (mix of photos and videos)")
         return downloaded
 
     async def _search_pexels(

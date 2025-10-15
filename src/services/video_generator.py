@@ -14,7 +14,7 @@ from moviepy import (
     TextClip,
     concatenate_videoclips,
 )
-from moviepy.video.fx import FadeIn, FadeOut, Resize
+from moviepy.video.fx import FadeIn, FadeOut, Resize, CrossFadeIn, CrossFadeOut
 
 
 class VideoGenerator:
@@ -70,8 +70,13 @@ class VideoGenerator:
             if progress_callback:
                 progress_callback(30)
 
-            # Concatenate all clips
-            final_video = concatenate_videoclips(video_clips, method="compose")
+            # Concatenate all clips with professional crossfade transitions
+            print(f"🎬 Assembling {len(video_clips)} scenes with crossfade transitions...")
+            final_video = concatenate_videoclips(
+                video_clips,
+                method="compose",
+                padding=-0.5  # Overlap clips by 0.5s for smooth crossfade
+            )
 
             if progress_callback:
                 progress_callback(50)
@@ -102,17 +107,17 @@ class VideoGenerator:
 
             # Export video with detailed progress tracking
             output_path = self.output_dir / f"{job_id}_video.mp4"
-            
+
             # Calculate total frames for progress
             total_frames = int(final_video.duration * self.fps)
-            
+
             def video_progress(current_frame, total_frames):
                 """Update progress during video rendering."""
                 if progress_callback and total_frames > 0:
                     # Map frame progress to 85-95% range
                     frame_progress = int((current_frame / total_frames) * 10) + 85
                     progress_callback(min(95, frame_progress))
-            
+
             print(f"🎬 Exporting video ({total_frames} frames)...")
             final_video.write_videofile(
                 str(output_path),
@@ -170,11 +175,11 @@ class VideoGenerator:
                 # Image file
                 clip = ImageClip(str(media_path), duration=duration)
 
-            # Apply professional effects: resize + fade in/out
+            # Apply professional effects: resize + crossfade transitions
             clip = clip.with_effects([
                 Resize(self.resolution),
-                FadeIn(0.5),
-                FadeOut(0.5)
+                CrossFadeIn(0.5),  # Smooth crossfade in
+                CrossFadeOut(0.5)  # Smooth crossfade out
             ])
 
             # Note: Ken Burns effect disabled for MoviePy 2.x compatibility
@@ -220,7 +225,7 @@ class VideoGenerator:
             stroke_color = caption.get('stroke_color', 'black')
             stroke_width = caption.get('stroke_width', 3)
             font = caption.get('font', '/System/Library/Fonts/Helvetica.ttc')
-            
+
             # Create text clip with MoviePy 2.x parameters
             try:
                 txt_clip = TextClip(
