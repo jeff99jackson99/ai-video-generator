@@ -14,25 +14,7 @@ from moviepy import (
     TextClip,
     concatenate_videoclips,
 )
-
-
-def apply_fade_in(clip, duration: float):
-    """Apply fade in effect - simplified for MoviePy 2.x."""
-    # MoviePy 2.x doesn't have built-in fade effects in the same way
-    # Return clip as-is (fade effects will be added in future update)
-    return clip
-
-
-def apply_fade_out(clip, duration: float):
-    """Apply fade out effect - simplified for MoviePy 2.x."""
-    # MoviePy 2.x doesn't have built-in fade effects in the same way
-    # Return clip as-is (fade effects will be added in future update)
-    return clip
-
-
-def apply_resize(clip, size):
-    """Apply resize effect using MoviePy 2.x API."""
-    return clip.resized(size)
+from moviepy.video.fx import FadeIn, FadeOut, Resize
 
 
 class VideoGenerator:
@@ -176,16 +158,15 @@ class VideoGenerator:
                 # Image file
                 clip = ImageClip(str(media_path), duration=duration)
 
-            # Resize to fit resolution
-            clip = apply_resize(clip, self.resolution)
+            # Apply professional effects: resize + fade in/out
+            clip = clip.with_effects([
+                Resize(self.resolution),
+                FadeIn(0.5),
+                FadeOut(0.5)
+            ])
 
-            # Add fade in/out transitions
-            clip = apply_fade_in(clip, 0.5)
-            clip = apply_fade_out(clip, 0.5)
-
-            # Apply subtle zoom effect for images (Ken Burns effect)
-            if media_path.suffix.lower() in ['.jpg', '.jpeg', '.png']:
-                clip = self._apply_ken_burns_effect(clip, duration)
+            # Note: Ken Burns effect disabled for MoviePy 2.x compatibility
+            # Will be re-added in future update with custom implementation
 
             clips.append(clip)
 
@@ -249,9 +230,11 @@ class VideoGenerator:
                 # Set timing
                 txt_clip = txt_clip.set_start(start).set_duration(duration)
 
-                # Add fade in/out for smooth appearance
-                txt_clip = apply_fade_in(txt_clip, 0.1)
-                txt_clip = apply_fade_out(txt_clip, 0.1)
+                # Add fade in/out for smooth caption appearance
+                txt_clip = txt_clip.with_effects([
+                    FadeIn(0.1),
+                    FadeOut(0.1)
+                ])
 
                 caption_clips.append(txt_clip)
 
@@ -283,7 +266,8 @@ class VideoGenerator:
             else:
                 clip = ImageClip(str(media_path), duration=clip_duration)
 
-            clip = apply_resize(clip, self.resolution)
+            # Resize for preview
+            clip = clip.with_effects([Resize(self.resolution)])
             clips.append(clip)
 
         # Concatenate clips
