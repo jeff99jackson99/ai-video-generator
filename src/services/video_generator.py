@@ -100,9 +100,20 @@ class VideoGenerator:
             if progress_callback:
                 progress_callback(85)
 
-            # Export video
+            # Export video with detailed progress tracking
             output_path = self.output_dir / f"{job_id}_video.mp4"
-
+            
+            # Calculate total frames for progress
+            total_frames = int(final_video.duration * self.fps)
+            
+            def video_progress(current_frame, total_frames):
+                """Update progress during video rendering."""
+                if progress_callback and total_frames > 0:
+                    # Map frame progress to 85-95% range
+                    frame_progress = int((current_frame / total_frames) * 10) + 85
+                    progress_callback(min(95, frame_progress))
+            
+            print(f"🎬 Exporting video ({total_frames} frames)...")
             final_video.write_videofile(
                 str(output_path),
                 fps=self.fps,
@@ -111,7 +122,8 @@ class VideoGenerator:
                 temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
                 remove_temp=True,
                 preset='medium',
-                threads=4
+                threads=4,
+                logger='bar'  # Show progress bar in terminal
             )
 
             if progress_callback:
