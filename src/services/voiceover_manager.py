@@ -85,7 +85,7 @@ class VoiceoverManager:
         """
         try:
             import edge_tts
-            
+
             # Professional voice selection - Microsoft Edge TTS (sounds like real people!)
             voice_map = {
                 # Male voices (professional, natural)
@@ -94,19 +94,19 @@ class VoiceoverManager:
                 "male-british": "en-GB-RyanNeural",  # British accent, professional
                 "male-calm": "en-US-DavisNeural",  # Calm, soothing male
                 "male-narrator": "en-US-BrandonNeural",  # Professional narrator
-                
+
                 # Female voices (warm, clear)
                 "female": "en-US-AriaNeural",  # Clear, professional female
                 "female-warm": "en-US-JennyNeural",  # Warm, friendly female
                 "female-british": "en-GB-SoniaNeural",  # British accent, elegant
                 "female-narrator": "en-US-SaraNeural",  # Professional narrator
-                
+
                 # Special voices
                 "default": "en-US-GuyNeural",  # Default to male
                 "narrator-male": "en-US-BrandonNeural",  # Best for narration
                 "narrator-female": "en-US-SaraNeural"  # Best for female narration
             }
-            
+
             edge_voice = voice_map.get(voice.lower(), voice_map["male"])
 
             print(f"🎙️ Using Microsoft Edge TTS voice: {edge_voice} (sounds like real person!)")

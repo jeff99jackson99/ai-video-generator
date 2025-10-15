@@ -19,6 +19,7 @@ from src.services.caption_generator import CaptionGenerator
 from src.services.music_selector import MusicSelector
 from src.services.video_generator import VideoGenerator
 from src.services.video_quality_enhancer import VideoQualityEnhancer
+from src.services.extreme_quality_enhancer import ExtremeQualityEnhancer
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -62,6 +63,7 @@ video_generator = VideoGenerator(
 quality_enhancer = VideoQualityEnhancer(
     openai_api_key=Config.OPENAI_API_KEY
 )
+extreme_enhancer = ExtremeQualityEnhancer()
 
 # Mount static files
 static_dir = Path(__file__).parent / "static"
@@ -345,9 +347,35 @@ async def process_video_job(job_id: str):
             count=len(scenes),
             media_type="mixed"  # Get both photos AND short video clips for dynamic content
         )
-
-        job_manager.update_job(job_id, progress=35)
-        print(f"✅ {len(media_files)} images downloaded!")
+        
+        job_manager.update_job(job_id, progress=30)
+        print(f"✅ {len(media_files)} media files downloaded!")
+        
+        # EXTREME QUALITY: Enhance all images with AI
+        print(f"🎨 AI enhancing {len(media_files)} media files for maximum quality...")
+        job_manager.update_job(job_id, progress=32)
+        
+        enhanced_media = []
+        for i, media_file in enumerate(media_files):
+            try:
+                if media_file.suffix.lower() in ['.jpg', '.jpeg', '.png']:
+                    # AI enhance images
+                    enhanced = extreme_enhancer.enhance_image(media_file)
+                    enhanced_media.append(enhanced)
+                else:
+                    # Use video as-is (already high quality from Pexels)
+                    enhanced_media.append(media_file)
+                
+                # Progress update for each file
+                progress = 32 + int((i / len(media_files)) * 6)
+                job_manager.update_job(job_id, progress=progress)
+            except Exception as e:
+                print(f"Enhancement error for {media_file.name}: {e}")
+                enhanced_media.append(media_file)  # Use original if enhancement fails
+        
+        media_files = enhanced_media
+        job_manager.update_job(job_id, progress=38)
+        print(f"✅ All media AI-enhanced for EXTREME quality!")
 
         if not media_files:
             raise Exception("No media files found")

@@ -118,18 +118,35 @@ class VideoGenerator:
                     frame_progress = int((current_frame / total_frames) * 10) + 85
                     progress_callback(min(95, frame_progress))
 
-            print(f"🎬 Exporting video ({total_frames} frames)...")
+            print(f"🎬 Exporting EXTREME QUALITY video ({total_frames} frames)...")
+            print(f"🚀 Using M4 Mac's full processing power...")
+            
+            # EXTREME QUALITY export settings for M4 Mac
             final_video.write_videofile(
                 str(output_path),
                 fps=self.fps,
-                codec='libx264',
+                codec='libx264',  # H.264 for compatibility
                 audio_codec='aac',
+                audio_bitrate='256k',  # HIGH QUALITY AUDIO
+                bitrate='10000k',  # VERY HIGH BITRATE (10 Mbps = broadcast quality)
                 temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
                 remove_temp=True,
-                preset='medium',
-                threads=4,
-                logger='bar'  # Show progress bar in terminal
+                preset='slower',  # BEST QUALITY (M4 Mac can handle it!)
+                threads=0,  # USE ALL M4 CORES (8-10 cores!)
+                logger='bar',
+                ffmpeg_params=[
+                    '-crf', '18',  # Constant Rate Factor 18 = NEAR LOSSLESS
+                    '-pix_fmt', 'yuv420p',  # Standard compatibility
+                    '-profile:v', 'high',  # H.264 HIGH PROFILE
+                    '-level', '4.2',
+                    '-movflags', '+faststart',  # Optimized for streaming
+                    '-colorspace', 'bt709',  # HD color space
+                    '-color_primaries', 'bt709',
+                    '-color_trc', 'bt709'
+                ]
             )
+            
+            print(f"✅ EXTREME QUALITY export complete!")
 
             if progress_callback:
                 progress_callback(100)
