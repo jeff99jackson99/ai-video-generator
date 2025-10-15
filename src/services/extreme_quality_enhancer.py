@@ -27,38 +27,36 @@ class ExtremeQualityEnhancer:
         if img.mode != 'RGB':
             img = img.convert('RGB')
 
-        # UPSCALE if image is too small (better quality for 720p)
-        if img.width < 1280 or img.height < 1280:
+        # OPTIMAL ENHANCEMENT: Balanced for speed + quality (720p baseline)
+        # Only upscale if needed for 720p
+        if img.width < 1280 and img.height < 1280:
             scale_factor = max(1280 / img.width, 1280 / img.height, 1.0)
             new_w = int(img.width * scale_factor)
             new_h = int(img.height * scale_factor)
             img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
 
-        # 1. AGGRESSIVE sharpening for clarity
-        img = img.filter(ImageFilter.UnsharpMask(radius=3, percent=200, threshold=2))
+        # 1. Smart sharpening (balanced)
+        img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
 
-        # 2. Detail enhancement
-        img = img.filter(ImageFilter.DETAIL)
-
-        # 3. Enhance colors AGGRESSIVELY (vibrant!)
+        # 2. Color boost (vibrant but not oversaturated)
         color_enhancer = ImageEnhance.Color(img)
-        img = color_enhancer.enhance(1.4)  # Boost colors by 40%!
+        img = color_enhancer.enhance(1.25)  # +25% color (punchy!)
 
-        # 4. Enhance contrast (punchy!)
+        # 3. Contrast boost (professional)
         contrast_enhancer = ImageEnhance.Contrast(img)
-        img = contrast_enhancer.enhance(1.3)  # Boost contrast by 30%
+        img = contrast_enhancer.enhance(1.20)  # +20% contrast
 
-        # 5. Enhance brightness
+        # 4. Brightness (well-lit)
         brightness_enhancer = ImageEnhance.Brightness(img)
-        img = brightness_enhancer.enhance(1.1)  # +10% brightness
+        img = brightness_enhancer.enhance(1.08)  # +8% brightness
 
-        # 6. Final sharpness pass (crisp!)
+        # 5. Final sharpness (crisp)
         sharpness_enhancer = ImageEnhance.Sharpness(img)
-        img = sharpness_enhancer.enhance(1.5)  # +50% sharpness!
+        img = sharpness_enhancer.enhance(1.3)  # +30% sharpness
 
-        # Save enhanced version with MAXIMUM quality
+        # Save with high quality (95% = great, faster than 98%)
         enhanced_path = image_path.parent / f"{image_path.stem}_enhanced{image_path.suffix}"
-        img.save(enhanced_path, quality=98, optimize=True)
+        img.save(enhanced_path, quality=95, optimize=True)
 
         return enhanced_path
 
