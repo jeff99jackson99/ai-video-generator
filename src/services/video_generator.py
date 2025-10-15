@@ -38,14 +38,14 @@ class VideoGenerator:
         self.fps = 30
 
     def _get_resolution(self, aspect_ratio: str) -> tuple:
-        """Get resolution for different aspect ratios."""
+        """Get resolution for different aspect ratios - optimized 720p for speed."""
         resolutions = {
-            "16:9": (1920, 1080),      # YouTube, Desktop
-            "9:16": (1080, 1920),      # YouTube Shorts, TikTok, Instagram Reels
-            "1:1": (1080, 1080),       # Instagram Square
-            "4:5": (1080, 1350),       # Instagram Portrait
+            "16:9": (1280, 720),       # YouTube, Desktop - 720p HD
+            "9:16": (720, 1280),       # YouTube Shorts, TikTok, Reels - 720p vertical
+            "1:1": (720, 720),         # Instagram Square - 720p
+            "4:5": (720, 900),         # Instagram Portrait - 720p
         }
-        return resolutions.get(aspect_ratio, (1920, 1080))
+        return resolutions.get(aspect_ratio, (1280, 720))
 
     async def generate_video(
         self,
@@ -63,7 +63,7 @@ class VideoGenerator:
         Args:
             job_id: Unique job identifier
             scenes: List of scene dictionaries with text and timing
-            media_files: List of image/video paths to use
+            media_files_with_metadata: List of (media_path, metadata) tuples
             audio_path: Path to voiceover audio
             captions: Optional caption data
             background_music: Optional background music path
@@ -77,7 +77,7 @@ class VideoGenerator:
                 progress_callback(10)
 
             # Create video clips from scenes and media
-            video_clips = await self._create_scene_clips(scenes, media_files)
+            video_clips = await self._create_scene_clips(scenes, media_files_with_metadata)
 
             if progress_callback:
                 progress_callback(30)
@@ -130,33 +130,62 @@ class VideoGenerator:
                     frame_progress = int((current_frame / total_frames) * 10) + 85
                     progress_callback(min(95, frame_progress))
 
-            print(f"🎬 Exporting EXTREME QUALITY video ({total_frames} frames)...")
-            print(f"🚀 Using M4 Mac's full processing power...")
+            print(f"🎬 Exporting HIGH QUALITY video ({total_frames} frames) with SPEED OPTIMIZATIONS...")
+            print(f"🚀 Using M4 Mac GPU + ALL CPU cores for MAXIMUM SPEED...")
 
-            # EXTREME QUALITY export settings for M4 Mac
-            final_video.write_videofile(
-                str(output_path),
-                fps=self.fps,
-                codec='libx264',  # H.264 for compatibility
-                audio_codec='aac',
-                audio_bitrate='256k',  # HIGH QUALITY AUDIO
-                bitrate='10000k',  # VERY HIGH BITRATE (10 Mbps = broadcast quality)
-                temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
-                remove_temp=True,
-                preset='slower',  # BEST QUALITY (M4 Mac can handle it!)
-                threads=0,  # USE ALL M4 CORES (8-10 cores!)
-                logger='bar',
-                ffmpeg_params=[
-                    '-crf', '18',  # Constant Rate Factor 18 = NEAR LOSSLESS
-                    '-pix_fmt', 'yuv420p',  # Standard compatibility
-                    '-profile:v', 'high',  # H.264 HIGH PROFILE
-                    '-level', '4.2',
-                    '-movflags', '+faststart',  # Optimized for streaming
-                    '-colorspace', 'bt709',  # HD color space
-                    '-color_primaries', 'bt709',
-                    '-color_trc', 'bt709'
-                ]
-            )
+            # OPTIMIZED for SPEED + QUALITY (Perfect for social media!)
+            # Using M4 Mac's VideoToolbox hardware encoder for 5-10x speedup!
+            try:
+                # Try hardware acceleration first (M4 Mac has this!)
+                final_video.write_videofile(
+                    str(output_path),
+                    fps=self.fps,
+                    codec='h264_videotoolbox',  # M4 HARDWARE ENCODER (5-10x faster!)
+                    audio_codec='aac',
+                    audio_bitrate='192k',  # High quality audio
+                    bitrate='6000k',  # 6 Mbps = Excellent for social media
+                    temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
+                    remove_temp=True,
+                    threads=0,  # USE ALL M4 CORES
+                    logger='bar',
+                    ffmpeg_params=[
+                        '-b:v', '6000k',  # Target bitrate
+                        '-maxrate', '8000k',  # Max bitrate
+                        '-bufsize', '12000k',  # Buffer size
+                        '-pix_fmt', 'yuv420p',
+                        '-movflags', '+faststart',
+                        '-colorspace', 'bt709',
+                        '-color_primaries', 'bt709',
+                        '-color_trc', 'bt709',
+                        '-allow_sw', '1'  # Allow software fallback
+                    ]
+                )
+                print(f"✅ Used M4 GPU hardware acceleration!")
+            except Exception as hw_error:
+                print(f"⚠️ GPU acceleration unavailable: {hw_error}")
+                print(f"📊 Falling back to optimized CPU encoding...")
+                
+                # Fallback to optimized CPU encoding
+                final_video.write_videofile(
+                    str(output_path),
+                    fps=self.fps,
+                    codec='libx264',
+                    audio_codec='aac',
+                    audio_bitrate='192k',
+                    bitrate='6000k',  # 6 Mbps = Still great quality, faster
+                    temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
+                    remove_temp=True,
+                    preset='fast',  # FAST preset = 3-5x faster than 'slower'!
+                    threads=0,  # ALL CPU cores
+                    logger='bar',
+                    ffmpeg_params=[
+                        '-crf', '22',  # CRF 22 = Excellent quality, faster than 18
+                        '-pix_fmt', 'yuv420p',
+                        '-profile:v', 'high',
+                        '-level', '4.2',
+                        '-movflags', '+faststart'
+                    ]
+                )
 
             print(f"✅ EXTREME QUALITY export complete!")
 

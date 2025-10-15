@@ -30,25 +30,25 @@ class SmartMediaSelector:
     ) -> List[tuple[Path, Dict]]:
         """
         Fetch perfect media for each scene using GPT-4 perfect search queries.
-        
+
         Returns:
             List of (media_path, scene_metadata) tuples with playback speed and transition info
         """
         results = []
-        
+
         print(f"🧠 Using GPT-4 to generate PERFECT search queries for {len(scenes)} scenes...")
-        
+
         for i, scene in enumerate(scenes):
             # Generate perfect search query using GPT-4
             search_data = await self.generate_perfect_pexels_query(scene)
-            
+
             # Fetch media using the perfect query
             media_path = await self._fetch_media_with_perfect_query(
                 search_data,
                 media_fetcher,
                 scene_index=i
             )
-            
+
             if media_path:
                 # Store metadata with media
                 scene_metadata = {
@@ -72,13 +72,13 @@ class SmartMediaSelector:
                         'search_query': 'fallback',
                         'reasoning': 'fallback placeholder'
                     }))
-        
+
         return results
 
     async def generate_perfect_pexels_query(self, scene: Dict) -> Dict:
         """
         Use GPT-4 to generate the PERFECT Pexels search query for this exact scene.
-        
+
         Analyzes what's being said and generates search terms that will find
         EXACTLY the right footage - not generic religious imagery!
         """
@@ -95,7 +95,7 @@ class SmartMediaSelector:
         try:
             narration = scene.get('text', '')
             visual_desc = scene.get('visual_description', '')
-            
+
             prompt = f"""Analyze this video scene narration and generate the PERFECT Pexels search query.
 
 NARRATION: "{narration}"
@@ -461,17 +461,17 @@ RESPOND IN THIS EXACT JSON FORMAT:
                 )
                 response.raise_for_status()
                 data = response.json()
-                
+
                 content = data['choices'][0]['message']['content']
                 result = json.loads(content)
-                
+
                 # Ensure variety - if query was used, modify it slightly
                 query = result.get('search_query', 'nature')
                 if query in self.used_queries:
                     query = query + " closeup"  # Slight variation
                 self.used_queries.add(query)
                 result['search_query'] = query
-                
+
                 return result
 
         except Exception as e:
@@ -494,33 +494,32 @@ RESPOND IN THIS EXACT JSON FORMAT:
         """Fetch media using the perfect query."""
         query = search_data.get('search_query', 'nature')
         media_type = search_data.get('media_type', 'mixed')
-        
+
         try:
             if media_fetcher.pexels_key:
                 # Search Pexels with perfect query
                 fetch_type = media_type if media_type in ['photos', 'videos'] else (
                     "photos" if scene_index % 2 == 0 else "videos"
                 )
-                
+
                 media_urls = await media_fetcher._search_pexels(
                     [query],
                     count=1,
                     media_type=fetch_type
                 )
-                
+
                 if media_urls:
                     media_path = await media_fetcher._download_file(media_urls[0])
                     return media_path
-            
+
             # Fallback to Unsplash
             if media_type in ["photos", "mixed"]:
                 keyword = query.replace(' ', ',')
                 url = f"https://source.unsplash.com/1920x1080/?{keyword}"
                 media_path = await media_fetcher._download_file_with_fallback(url, query, scene_index)
                 return media_path
-                
+
         except Exception as e:
             print(f"Error fetching with perfect query '{query}': {e}")
-        
-        return None
 
+        return None

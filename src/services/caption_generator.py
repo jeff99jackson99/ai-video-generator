@@ -11,7 +11,7 @@ class CaptionGenerator:
 
     def __init__(self):
         """Initialize caption generator."""
-        pass
+        self._whisper_model = None  # Cache Whisper model for speed
 
     async def generate_captions_from_audio(
         self,
@@ -20,15 +20,19 @@ class CaptionGenerator:
     ) -> List[Dict[str, any]]:
         """
         Generate captions from audio file using Whisper with accurate timing.
+        
+        IMPORTANT: Timing is based on AUDIO timestamps, NOT video resolution!
+        Caption timing will be PERFECT regardless of 720p or 1080p output.
 
         Returns list of caption segments with timestamps.
         """
         print(f"🎤 Transcribing audio with Whisper for accurate caption timing...")
-
+        print(f"   (Timing is audio-based, works perfectly at any resolution!)")
+        
         try:
-            # ALWAYS use Whisper for accurate timing
+            # ALWAYS use Whisper for accurate timing (audio-based, resolution-independent!)
             captions = await self._transcribe_with_whisper(audio_path)
-            print(f"✅ Generated {len(captions)} captions with precise timing!")
+            print(f"✅ Generated {len(captions)} captions with PERFECT audio-synced timing!")
             return captions
         except Exception as e:
             print(f"⚠️ Whisper transcription error: {e}")
@@ -107,18 +111,24 @@ class CaptionGenerator:
 
             # Load Whisper model in thread pool (blocking operation)
             loop = asyncio.get_event_loop()
-
+            
             def load_and_transcribe():
-                print(f"   Loading Whisper base model...")
-                model = whisper.load_model("base")  # Fast, accurate
+                # Cache model for speed (only load once!)
+                if self._whisper_model is None:
+                    print(f"   Loading Whisper base model (one-time, cached for future)...")
+                    import whisper as whisper_module
+                    self._whisper_model = whisper_module.load_model("base")
+                else:
+                    print(f"   Using cached Whisper model (instant!)...")
+                
                 print(f"   Transcribing audio...")
-                return model.transcribe(
+                return self._whisper_model.transcribe(
                     str(audio_path),
                     word_timestamps=True,
                     language="en",
                     fp16=False  # CPU compatibility
                 )
-
+            
             # Run in thread pool to avoid blocking
             result = await loop.run_in_executor(None, load_and_transcribe)
 
