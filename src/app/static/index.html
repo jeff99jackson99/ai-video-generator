@@ -279,7 +279,8 @@
 
                     <div id="voiceOptions" style="margin-top: 10px;">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <label for="voice" style="flex: 1; margin: 0;">Voice Style (30+ Natural Voices - FREE!)</label>
+                            <label for="voice" style="flex: 1; margin: 0;">Voice Style (30+ Natural Voices -
+                                FREE!)</label>
                             <button type="button" id="previewVoiceBtn" style="padding: 8px 16px; font-size: 14px;">
                                 🔊 Preview Voice
                             </button>
@@ -384,6 +385,27 @@
                         <p style="font-size: 12px; color: #666; margin-top: 5px;">
                             💡 UPPERCASE is great for shorts and TikTok!
                         </p>
+                        
+                        <!-- LIVE CAPTION PREVIEW -->
+                        <div id="captionPreview" class="caption-preview caption-modern" style="
+                            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                            color: white;
+                            padding: 30px;
+                            text-align: center;
+                            border-radius: 12px;
+                            margin-top: 15px;
+                            min-height: 100px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-family: 'Segoe UI', sans-serif;
+                            font-size: 28px;
+                            font-weight: 600;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+                            border: 3px solid rgba(255,255,255,0.1);
+                        ">
+                            THIS IS HOW YOUR CAPTIONS WILL LOOK
+                        </div>
                     </div>
                 </div>
 
@@ -444,24 +466,24 @@
         });
 
         // Voice preview functionality
-        document.getElementById('previewVoiceBtn').addEventListener('click', async function() {
+        document.getElementById('previewVoiceBtn').addEventListener('click', async function () {
             const voice = document.getElementById('voice').value;
             const btn = this;
             const originalText = btn.textContent;
-            
+
             try {
                 btn.disabled = true;
                 btn.textContent = '🔄 Loading...';
-                
+
                 const audio = new Audio(`/api/preview-voice/${voice}`);
                 audio.play();
-                
-                audio.onended = function() {
+
+                audio.onended = function () {
                     btn.disabled = false;
                     btn.textContent = originalText;
                 };
-                
-                audio.onerror = function() {
+
+                audio.onerror = function () {
                     btn.disabled = false;
                     btn.textContent = originalText;
                     alert('Preview failed. Please try again.');
@@ -472,6 +494,111 @@
                 console.error('Preview error:', error);
             }
         });
+
+        // Caption preview functionality - update in real-time!
+        function updateCaptionPreview() {
+            const style = document.getElementById('captionStyle').value;
+            const preview = document.getElementById('captionPreview');
+            
+            // Style configurations matching MoviePy exactly
+            const styles = {
+                'modern': {
+                    text: 'This Is How Your Captions Will Look',
+                    color: 'white',
+                    fontSize: '28px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    textShadow: '2px 2px 4px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black',
+                    fontWeight: '600'
+                },
+                'uppercase': {
+                    text: 'THIS IS HOW YOUR CAPTIONS WILL LOOK',
+                    color: 'white',
+                    fontSize: '32px',
+                    fontFamily: 'Impact, sans-serif',
+                    textShadow: '3px 3px 6px black, -2px -2px 4px black, 2px -2px 4px black, -2px 2px 4px black',
+                    fontWeight: 'bold'
+                },
+                'lowercase': {
+                    text: 'this is how your captions will look',
+                    color: 'white',
+                    fontSize: '24px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    textShadow: '2px 2px 3px black',
+                    fontWeight: '400'
+                },
+                'classic': {
+                    text: 'This Is How Your Captions Will Look',
+                    color: '#ffff00',
+                    fontSize: '26px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    textShadow: '2px 2px 3px black',
+                    fontWeight: '600'
+                },
+                'minimal': {
+                    text: 'This Is How Your Captions Will Look',
+                    color: 'white',
+                    fontSize: '26px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    textShadow: 'none',
+                    fontWeight: '300'
+                },
+                'bold': {
+                    text: 'This Is How Your Captions Will Look',
+                    color: 'white',
+                    fontSize: '34px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    textShadow: '3px 3px 6px black, -2px -2px 4px black',
+                    fontWeight: 'bold'
+                },
+                'elegant': {
+                    text: 'This Is How Your Captions Will Look',
+                    color: '#f0f0f0',
+                    fontSize: '28px',
+                    fontFamily: "'Georgia', serif",
+                    textShadow: '2px 2px 3px #333',
+                    fontWeight: '400'
+                },
+                'neon': {
+                    text: 'THIS IS HOW YOUR CAPTIONS WILL LOOK',
+                    color: '#00ffff',
+                    fontSize: '32px',
+                    fontFamily: 'Impact, sans-serif',
+                    textShadow: '0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff, 2px 2px 4px black',
+                    fontWeight: 'bold'
+                },
+                'shadow': {
+                    text: 'This Is How Your Captions Will Look',
+                    color: 'white',
+                    fontSize: '30px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    textShadow: '4px 4px 8px black, -2px -2px 4px black, 2px -2px 4px black, -2px 2px 4px black',
+                    fontWeight: 'bold'
+                },
+                'outline': {
+                    text: 'THIS IS HOW YOUR CAPTIONS WILL LOOK',
+                    color: 'black',
+                    fontSize: '32px',
+                    fontFamily: 'Impact, sans-serif',
+                    textShadow: '-2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white, 2px 2px 0 white',
+                    fontWeight: 'bold'
+                }
+            };
+            
+            const styleConfig = styles[style] || styles['modern'];
+            
+            preview.textContent = styleConfig.text;
+            preview.style.color = styleConfig.color;
+            preview.style.fontSize = styleConfig.fontSize;
+            preview.style.fontFamily = styleConfig.fontFamily;
+            preview.style.textShadow = styleConfig.textShadow;
+            preview.style.fontWeight = styleConfig.fontWeight;
+        }
+        
+        // Update preview when caption style changes
+        document.getElementById('captionStyle').addEventListener('change', updateCaptionPreview);
+        
+        // Initialize preview on page load
+        updateCaptionPreview();
 
         // Form submission
         document.getElementById('videoForm').addEventListener('submit', async function (e) {

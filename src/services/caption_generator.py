@@ -363,7 +363,7 @@ class CaptionGenerator:
         styled_captions = []
         for caption in captions:
             styled_caption = {**caption, **style_config}
-            
+
             # Apply text transformation if specified
             text_transform = style_config.get("text_transform")
             if text_transform == "upper":
@@ -372,7 +372,7 @@ class CaptionGenerator:
                 styled_caption["text"] = styled_caption["text"].lower()
             elif text_transform == "title":
                 styled_caption["text"] = styled_caption["text"].title()
-            
+
             styled_captions.append(styled_caption)
 
         return styled_captions

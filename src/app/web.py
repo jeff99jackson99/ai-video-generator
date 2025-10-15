@@ -21,6 +21,7 @@ from src.services.video_generator import VideoGenerator
 from src.services.video_quality_enhancer import VideoQualityEnhancer
 from src.services.extreme_quality_enhancer import ExtremeQualityEnhancer
 from src.services.media_verifier import MediaVerifier
+from src.services.smart_media_selector import SmartMediaSelector
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -67,6 +68,11 @@ quality_enhancer = VideoQualityEnhancer(
 extreme_enhancer = ExtremeQualityEnhancer()
 media_verifier = MediaVerifier(
     openai_api_key=Config.OPENAI_API_KEY
+)
+smart_media_selector = SmartMediaSelector(
+    openai_api_key=Config.OPENAI_API_KEY,
+    pexels_key=Config.PEXELS_API_KEY,
+    cache_dir=Config.MEDIA_DIR
 )
 
 # Mount static files
@@ -322,7 +328,7 @@ async def preview_voice(voice_name: str):
     """Generate a short preview of a voice."""
     try:
         preview_text = "Hello! This is a preview of this voice. Perfect for your video."
-        
+
         # Generate preview audio
         preview_id = f"preview_{voice_name}"
         preview_audio = await voiceover_manager.generate_tts(
@@ -330,7 +336,7 @@ async def preview_voice(voice_name: str):
             preview_id,
             voice=voice_name
         )
-        
+
         return FileResponse(
             preview_audio,
             media_type="audio/mpeg",
@@ -367,80 +373,47 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=15)
         print(f"✅ Script enhanced! {len(scenes)} scenes, {len(keywords)} keywords")
 
-        # Step 2: Fetch UNIQUE media per scene (no more repetition!)
+        # Step 2: SMART MEDIA SELECTION using GPT-4 perfect queries!
         job_manager.update_job(job_id, progress=20)
-        print(f"📸 Fetching unique media for {len(scenes)} scenes using AI visual descriptions...")
+        print(f"🧠 Using GPT-4 to generate PERFECT search queries for {len(scenes)} scenes...")
         job_manager.update_job(job_id, progress=22)
 
-        # Use per-scene fetching for unique, contextually-relevant media
-        media_files = await media_fetcher.search_and_download_per_scene(
+        # Use SMART selector - GPT-4 generates perfect queries based on what's being said!
+        media_files_with_metadata = await smart_media_selector.fetch_perfect_media_per_scene(
             scenes,
-            media_type="mixed"  # Get both photos AND short video clips for dynamic content
+            media_fetcher  # Pass fetcher for Pexels API access
         )
 
         job_manager.update_job(job_id, progress=28)
-        print(f"✅ {len(media_files)} unique media files downloaded (one per scene)!")
+        print(f"✅ {len(media_files_with_metadata)} PERFECTLY-MATCHED media files downloaded!")
 
-        # Step 2.5: VERIFY media matches scene descriptions (GPT-4 Vision)
-        if Config.OPENAI_API_KEY:
-            job_manager.update_job(job_id, progress=29)
-            print(f"🔍 Verifying media quality with GPT-4 Vision...")
-
-            verified_media = []
-            for i, (media_file, scene) in enumerate(zip(media_files, scenes)):
-                visual_desc = scene.get('visual_description', '')
-                visual_keywords = scene.get('visual_keywords', [])
-
-                verification = await media_verifier.verify_media_matches_scene(
-                    media_file,
-                    visual_desc,
-                    visual_keywords
-                )
-
-                # Accept media if score >= 60
-                if verification['matches']:
-                    verified_media.append(media_file)
-                    print(f"  ✅ Scene {i+1}: {verification['confidence_score']}/100 - {verification['explanation'][:50]}...")
-                else:
-                    # Keep it anyway but log warning (don't block video generation)
-                    verified_media.append(media_file)
-                    print(f"  ⚠️ Scene {i+1}: {verification['confidence_score']}/100 - Using anyway")
-
-                # Update progress for each verification
-                progress = 29 + int((i / len(media_files)) * 2)
-                job_manager.update_job(job_id, progress=progress)
-
-            media_files = verified_media
-            job_manager.update_job(job_id, progress=31)
-            print(f"✅ All media verified!")
-
-        # EXTREME QUALITY: Enhance all images with AI
-        print(f"🎨 AI enhancing {len(media_files)} media files for maximum quality...")
+        # Step 2.5: Enhance media (work with tuples)
+        print(f"🎨 AI enhancing {len(media_files_with_metadata)} media files for maximum quality...")
         job_manager.update_job(job_id, progress=32)
 
-        enhanced_media = []
-        for i, media_file in enumerate(media_files):
+        enhanced_media_with_metadata = []
+        for i, (media_file, metadata) in enumerate(media_files_with_metadata):
             try:
                 if media_file.suffix.lower() in ['.jpg', '.jpeg', '.png']:
                     # AI enhance images
                     enhanced = extreme_enhancer.enhance_image(media_file)
-                    enhanced_media.append(enhanced)
+                    enhanced_media_with_metadata.append((enhanced, metadata))
                 else:
                     # Use video as-is (already high quality from Pexels)
-                    enhanced_media.append(media_file)
+                    enhanced_media_with_metadata.append((media_file, metadata))
 
                 # Progress update for each file
-                progress = 32 + int((i / len(media_files)) * 6)
+                progress = 32 + int((i / len(media_files_with_metadata)) * 6)
                 job_manager.update_job(job_id, progress=progress)
             except Exception as e:
                 print(f"Enhancement error for {media_file.name}: {e}")
-                enhanced_media.append(media_file)  # Use original if enhancement fails
+                enhanced_media_with_metadata.append((media_file, metadata))  # Use original if enhancement fails
 
-        media_files = enhanced_media
+        media_files_with_metadata = enhanced_media_with_metadata
         job_manager.update_job(job_id, progress=38)
         print(f"✅ All media AI-enhanced for EXTREME quality!")
 
-        if not media_files:
+        if not media_files_with_metadata:
             raise Exception("No media files found")
 
         # Step 3: Generate or load voiceover with progress
@@ -530,7 +503,7 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=75)
         aspect_ratio = options.get('aspect_ratio', '16:9')
         print(f"🎬 Starting video assembly ({aspect_ratio})...")
-        
+
         # Create video generator with specified aspect ratio
         video_gen = VideoGenerator(
             output_dir=Config.OUTPUT_DIR,
@@ -546,7 +519,7 @@ async def process_video_job(job_id: str):
         output_path = await video_gen.generate_video(
             job_id=job_id,
             scenes=scenes,
-            media_files=media_files,
+            media_files_with_metadata=media_files_with_metadata,  # Pass with metadata!
             audio_path=voiceover_path,
             captions=captions,
             background_music=music_path,
