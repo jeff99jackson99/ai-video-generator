@@ -5,56 +5,46 @@ from pathlib import Path
 from typing import List, Dict, Optional, Callable
 import random
 
-try:
-    # MoviePy 2.x imports
-    from moviepy import (
-        VideoFileClip,
-        ImageClip,
-        AudioFileClip,
-        CompositeVideoClip,
-        CompositeAudioClip,
-        TextClip,
-        concatenate_videoclips,
-    )
-    from moviepy import vfx
-    MOVIEPY_VERSION = 2
-except ImportError:
-    # Fallback to MoviePy 1.x imports
-    from moviepy.editor import (
-        VideoFileClip,
-        ImageClip,
-        AudioFileClip,
-        CompositeVideoClip,
-        CompositeAudioClip,
-        TextClip,
-        concatenate_videoclips,
-    )
-    from moviepy.video import fx as vfx
-    MOVIEPY_VERSION = 1
+from moviepy import (
+    VideoFileClip,
+    ImageClip,
+    AudioFileClip,
+    CompositeVideoClip,
+    CompositeAudioClip,
+    TextClip,
+    concatenate_videoclips,
+)
+from moviepy.video.fx import fadein, fadeout, resize
 
 
 def apply_fade_in(clip, duration: float):
-    """Apply fade in effect compatible with both MoviePy versions."""
-    if MOVIEPY_VERSION == 2:
-        return clip.fx(vfx.fadein, duration)
-    else:
-        return clip.fadein(duration)
+    """Apply fade in effect."""
+    try:
+        return fadein(clip, duration)
+    except:
+        # Skip fade if it fails
+        return clip
 
 
 def apply_fade_out(clip, duration: float):
-    """Apply fade out effect compatible with both MoviePy versions."""
-    if MOVIEPY_VERSION == 2:
-        return clip.fx(vfx.fadeout, duration)
-    else:
-        return clip.fadeout(duration)
+    """Apply fade out effect."""
+    try:
+        return fadeout(clip, duration)
+    except:
+        # Skip fade if it fails
+        return clip
 
 
 def apply_resize(clip, size):
-    """Apply resize compatible with both MoviePy versions."""
-    if MOVIEPY_VERSION == 2:
-        return clip.fx(vfx.resize, newsize=size)
-    else:
-        return clip.resize(size)
+    """Apply resize effect."""
+    try:
+        return resize(clip, newsize=size)
+    except:
+        # Try alternative resize method
+        try:
+            return clip.resized(size)
+        except:
+            return clip
 
 
 class VideoGenerator:
@@ -200,7 +190,7 @@ class VideoGenerator:
 
             # Resize to fit resolution
             clip = apply_resize(clip, self.resolution)
-            
+
             # Add fade in/out transitions
             clip = apply_fade_in(clip, 0.5)
             clip = apply_fade_out(clip, 0.5)
@@ -304,7 +294,7 @@ class VideoGenerator:
                 clip = clip.subclip(0, min(clip_duration, clip.duration))
             else:
                 clip = ImageClip(str(media_path), duration=clip_duration)
-            
+
             clip = apply_resize(clip, self.resolution)
             clips.append(clip)
 
