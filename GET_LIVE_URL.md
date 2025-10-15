@@ -227,4 +227,3 @@ Check your platform dashboard to see:
 ---
 
 Made with ❤️ - Now deployable anywhere!
-

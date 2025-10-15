@@ -24,4 +24,3 @@ value = "1"
 [[env]]
 key = "MAX_VIDEO_LENGTH_SECONDS"
 value = "180"
-

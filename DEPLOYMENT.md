@@ -319,4 +319,3 @@ docker-compose up -d
 ---
 
 **Need Help?** Open an issue on [GitHub](https://github.com/jeff99jackson99/ai-video-generator/issues)
-

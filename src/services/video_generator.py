@@ -3,16 +3,28 @@
 import asyncio
 from pathlib import Path
 from typing import List, Dict, Optional, Callable
-from moviepy.editor import (
-    VideoFileClip,
-    ImageClip,
-    AudioFileClip,
-    CompositeVideoClip,
-    CompositeAudioClip,
-    TextClip,
-    concatenate_videoclips,
-)
-from moviepy.video.fx.all import fadein, fadeout, resize
+try:
+    # MoviePy 2.x imports
+    from moviepy import (
+        VideoFileClip,
+        ImageClip,
+        AudioFileClip,
+        CompositeVideoClip,
+        CompositeAudioClip,
+        TextClip,
+        concatenate_videoclips,
+    )
+except ImportError:
+    # Fallback to MoviePy 1.x imports
+    from moviepy.editor import (
+        VideoFileClip,
+        ImageClip,
+        AudioFileClip,
+        CompositeVideoClip,
+        CompositeAudioClip,
+        TextClip,
+        concatenate_videoclips,
+    )
 import random
 
 
@@ -158,11 +170,11 @@ class VideoGenerator:
                 clip = ImageClip(str(media_path), duration=duration)
 
             # Resize to fit resolution
-            clip = clip.resize(self.resolution)
-
+            clip = clip.resized(self.resolution)
+            
             # Add fade in/out transitions
-            clip = fadein(clip, 0.5)
-            clip = fadeout(clip, 0.5)
+            clip = clip.fadein(0.5)
+            clip = clip.fadeout(0.5)
 
             # Apply subtle zoom effect for images (Ken Burns effect)
             if media_path.suffix.lower() in ['.jpg', '.jpeg', '.png']:
@@ -231,8 +243,8 @@ class VideoGenerator:
                 txt_clip = txt_clip.set_start(start).set_duration(duration)
 
                 # Add fade in/out for smooth appearance
-                txt_clip = fadein(txt_clip, 0.1)
-                txt_clip = fadeout(txt_clip, 0.1)
+                txt_clip = txt_clip.fadein(0.1)
+                txt_clip = txt_clip.fadeout(0.1)
 
                 caption_clips.append(txt_clip)
 
@@ -263,8 +275,8 @@ class VideoGenerator:
                 clip = clip.subclip(0, min(clip_duration, clip.duration))
             else:
                 clip = ImageClip(str(media_path), duration=clip_duration)
-
-            clip = clip.resize(self.resolution)
+            
+            clip = clip.resized(self.resolution)
             clips.append(clip)
 
         # Concatenate clips
