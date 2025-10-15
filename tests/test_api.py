@@ -80,4 +80,3 @@ def test_list_jobs():
     data = response.json()
     assert "jobs" in data
     assert isinstance(data["jobs"], list)
-

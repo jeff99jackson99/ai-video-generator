@@ -113,7 +113,7 @@ async def generate_video(
 ):
     """
     Generate a video from a script.
-    
+
     Args:
         script: The video script text
         use_tts: Use text-to-speech (if False, must upload voice recording)
@@ -134,26 +134,26 @@ async def generate_video(
             "add_music": add_music,
             "mood": mood
         }
-        
+
         job_id = job_manager.create_job(script, options)
-        
+
         # Save voice recording if provided
         if voice_recording:
             audio_data = await voice_recording.read()
             await voiceover_manager.save_recording(audio_data, job_id, format="mp3")
-        
+
         # Start background processing
         if background_tasks:
             background_tasks.add_task(process_video_job, job_id)
         else:
             asyncio.create_task(process_video_job(job_id))
-        
+
         return {
             "job_id": job_id,
             "status": "pending",
             "message": "Video generation started"
         }
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -162,10 +162,10 @@ async def generate_video(
 async def get_job_status(job_id: str):
     """Get the status of a video generation job."""
     job = job_manager.get_job(job_id)
-    
+
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    
+
     return {
         "job_id": job.job_id,
         "status": job.status.value,
@@ -181,20 +181,20 @@ async def get_job_status(job_id: str):
 async def download_video(job_id: str):
     """Download the generated video."""
     job = job_manager.get_job(job_id)
-    
+
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    
+
     if job.status != JobStatus.COMPLETED:
         raise HTTPException(status_code=400, detail="Video not ready yet")
-    
+
     if not job.output_file:
         raise HTTPException(status_code=404, detail="Output file not found")
-    
+
     video_path = Path(job.output_file)
     if not video_path.exists():
         raise HTTPException(status_code=404, detail="Video file not found")
-    
+
     return FileResponse(
         video_path,
         media_type="video/mp4",
@@ -209,15 +209,15 @@ async def save_settings(settings: SettingsRequest):
         # In production, these should be stored securely per user
         # For now, we'll update the environment (session only)
         settings_file = Config.DATA_DIR / "user_settings.json"
-        
+
         # Encrypt API keys before storing
         encrypted_settings = {}
         for key, value in settings.dict().items():
             if value:
                 encrypted_settings[key] = Config.encrypt_api_key(value)
-        
+
         settings_file.write_text(json.dumps(encrypted_settings, indent=2))
-        
+
         # Update current session
         if settings.gemini_api_key:
             Config.GEMINI_API_KEY = settings.gemini_api_key
@@ -229,7 +229,7 @@ async def save_settings(settings: SettingsRequest):
             Config.UNSPLASH_API_KEY = settings.unsplash_api_key
         if settings.pixabay_api_key:
             Config.PIXABAY_API_KEY = settings.pixabay_api_key
-        
+
         # Reinitialize services with new keys
         global script_enhancer, media_fetcher, music_selector
         script_enhancer = ScriptEnhancer(
@@ -246,9 +246,9 @@ async def save_settings(settings: SettingsRequest):
             pixabay_key=Config.PIXABAY_API_KEY,
             music_dir=Config.DATA_DIR / "music"
         )
-        
+
         return {"message": "Settings saved successfully"}
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -257,7 +257,7 @@ async def save_settings(settings: SettingsRequest):
 async def get_settings():
     """Get current settings (without revealing API keys)."""
     settings_file = Config.DATA_DIR / "user_settings.json"
-    
+
     if not settings_file.exists():
         return {
             "has_gemini": bool(Config.GEMINI_API_KEY),
@@ -266,9 +266,9 @@ async def get_settings():
             "has_unsplash": bool(Config.UNSPLASH_API_KEY),
             "has_pixabay": bool(Config.PIXABAY_API_KEY)
         }
-    
+
     encrypted_settings = json.loads(settings_file.read_text())
-    
+
     return {
         "has_gemini": "gemini_api_key" in encrypted_settings,
         "has_groq": "groq_api_key" in encrypted_settings,
@@ -282,7 +282,7 @@ async def get_settings():
 async def list_jobs(limit: int = 20):
     """List recent jobs."""
     jobs = job_manager.list_jobs(limit=limit)
-    
+
     return {
         "jobs": [
             {
@@ -303,32 +303,32 @@ async def process_video_job(job_id: str):
     try:
         # Update status
         job_manager.update_job(job_id, status=JobStatus.PROCESSING, progress=5)
-        
+
         job = job_manager.get_job(job_id)
         if not job:
             return
-        
+
         script = job.script
         options = job.options
-        
+
         # Step 1: Enhance script with AI
         job_manager.update_job(job_id, progress=10)
         enhanced_data = await script_enhancer.enhance_script(script)
         scenes = enhanced_data['scenes']
         keywords = enhanced_data['keywords']
         mood = options.get('mood', enhanced_data.get('mood', 'professional'))
-        
+
         # Step 2: Fetch media
         job_manager.update_job(job_id, progress=25)
         media_files = await media_fetcher.search_and_download(keywords, count=len(scenes))
-        
+
         if not media_files:
             raise Exception("No media files found")
-        
+
         # Step 3: Generate or load voiceover
         job_manager.update_job(job_id, progress=40)
         voiceover_path = Config.VOICEOVER_DIR / f"{job_id}_recording.mp3"
-        
+
         if not voiceover_path.exists():
             # Generate TTS
             full_script = enhanced_data['enhanced_script']
@@ -337,13 +337,13 @@ async def process_video_job(job_id: str):
                 job_id,
                 voice=options.get('voice', 'default')
             )
-        
+
         # Process audio
         voiceover_path = await voiceover_manager.process_audio(voiceover_path)
-        
+
         # Sync scenes with audio timing
         scenes = await voiceover_manager.sync_audio_to_script(voiceover_path, scenes)
-        
+
         # Step 4: Generate captions
         job_manager.update_job(job_id, progress=55)
         captions = None
@@ -357,7 +357,7 @@ async def process_video_job(job_id: str):
                 captions,
                 style=options.get('caption_style', 'modern')
             )
-        
+
         # Step 5: Get background music
         job_manager.update_job(job_id, progress=65)
         music_path = None
@@ -371,13 +371,13 @@ async def process_video_job(job_id: str):
                     music_path,
                     voiceover_manager.get_audio_duration(voiceover_path)
                 )
-        
+
         # Step 6: Generate video
         job_manager.update_job(job_id, progress=75)
-        
+
         def update_progress(progress: int):
             job_manager.update_job(job_id, progress=progress)
-        
+
         output_path = await video_generator.generate_video(
             job_id=job_id,
             scenes=scenes,
@@ -387,7 +387,7 @@ async def process_video_job(job_id: str):
             background_music=music_path,
             progress_callback=update_progress
         )
-        
+
         # Mark as completed
         job_manager.update_job(
             job_id,
@@ -395,7 +395,7 @@ async def process_video_job(job_id: str):
             progress=100,
             output_file=str(output_path)
         )
-        
+
     except Exception as e:
         print(f"Error processing job {job_id}: {e}")
         job_manager.update_job(
@@ -408,4 +408,3 @@ async def process_video_job(job_id: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=Config.APP_HOST, port=Config.APP_PORT)
-

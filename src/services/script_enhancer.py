@@ -7,7 +7,7 @@ import httpx
 
 class ScriptEnhancer:
     """Enhances scripts using AI models."""
-    
+
     def __init__(
         self,
         gemini_api_key: Optional[str] = None,
@@ -16,11 +16,11 @@ class ScriptEnhancer:
         """Initialize script enhancer."""
         self.gemini_api_key = gemini_api_key
         self.groq_api_key = groq_api_key
-    
+
     async def enhance_script(self, script: str) -> Dict[str, Any]:
         """
         Enhance script with AI suggestions.
-        
+
         Returns:
             {
                 "enhanced_script": str,
@@ -36,25 +36,25 @@ class ScriptEnhancer:
                 return await self._enhance_with_gemini(script)
             except Exception as e:
                 print(f"Gemini API error: {e}, falling back to Groq")
-        
+
         # Try Groq as fallback
         if self.groq_api_key:
             try:
                 return await self._enhance_with_groq(script)
             except Exception as e:
                 print(f"Groq API error: {e}, using basic enhancement")
-        
+
         # Basic enhancement without AI
         return self._basic_enhancement(script)
-    
+
     async def _enhance_with_gemini(self, script: str) -> Dict[str, Any]:
         """Enhance script using Google Gemini API."""
         try:
             import google.generativeai as genai
-            
+
             genai.configure(api_key=self.gemini_api_key)
             model = genai.GenerativeModel('gemini-pro')
-            
+
             prompt = f"""Analyze this video script and provide:
 1. An enhanced version with better pacing and clarity
 2. Break it into scenes with visual descriptions
@@ -76,9 +76,9 @@ Return your response in this JSON format:
     "mood": "mood description",
     "duration_estimate": 60
 }}"""
-            
+
             response = model.generate_content(prompt)
-            
+
             # Parse JSON from response
             import json
             # Extract JSON from markdown code blocks if present
@@ -87,12 +87,12 @@ Return your response in this JSON format:
                 text = text.split("```json")[1].split("```")[0]
             elif "```" in text:
                 text = text.split("```")[1].split("```")[0]
-            
+
             return json.loads(text)
-            
+
         except Exception as e:
             raise Exception(f"Gemini API error: {e}")
-    
+
     async def _enhance_with_groq(self, script: str) -> Dict[str, Any]:
         """Enhance script using Groq API."""
         async with httpx.AsyncClient() as client:
@@ -130,7 +130,7 @@ Return ONLY valid JSON in this format:
             )
             response.raise_for_status()
             data = response.json()
-            
+
             import json
             content = data['choices'][0]['message']['content']
             # Clean markdown if present
@@ -138,16 +138,16 @@ Return ONLY valid JSON in this format:
                 content = content.split("```json")[1].split("```")[0]
             elif "```" in content:
                 content = content.split("```")[1].split("```")[0]
-            
+
             return json.loads(content)
-    
+
     def _basic_enhancement(self, script: str) -> Dict[str, Any]:
         """Basic script enhancement without AI."""
         # Split script into sentences
         import re
         sentences = re.split(r'[.!?]+', script)
         sentences = [s.strip() for s in sentences if s.strip()]
-        
+
         # Create basic scenes (one per sentence or two)
         scenes = []
         for i in range(0, len(sentences), 2):
@@ -157,13 +157,13 @@ Return ONLY valid JSON in this format:
                 "visual_description": f"Visual for: {scene_text[:50]}...",
                 "duration": 5
             })
-        
+
         # Extract simple keywords (nouns and important words)
         words = script.lower().split()
         # Filter out common words
         stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were'}
         keywords = list(set([w.strip('.,!?') for w in words if len(w) > 4 and w not in stop_words]))[:10]
-        
+
         return {
             "enhanced_script": script,
             "scenes": scenes,
@@ -171,7 +171,7 @@ Return ONLY valid JSON in this format:
             "mood": "professional",
             "duration_estimate": len(scenes) * 5
         }
-    
+
     def extract_keywords(self, text: str) -> List[str]:
         """Extract keywords from text for media search."""
         # Simple keyword extraction
@@ -179,4 +179,3 @@ Return ONLY valid JSON in this format:
         stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were'}
         keywords = [w.strip('.,!?') for w in words if len(w) > 3 and w not in stop_words]
         return list(set(keywords))[:10]
-

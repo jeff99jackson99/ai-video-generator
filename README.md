@@ -6,6 +6,14 @@ Create professional AI-powered videos from scripts with automated visuals, voice
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+## 🚀 One-Click Deploy (Get Live URL Now!)
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/jeff99jackson99/ai-video-generator)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/jeff99jackson99/ai-video-generator)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jeff99jackson99/ai-video-generator)
+
+**🌐 Want a live URL?** Click a button above to deploy in 2 minutes! See [DEPLOYMENT.md](DEPLOYMENT.md) for details.
+
 ## ✨ Features
 
 - 🤖 **AI Script Enhancement** - Automatically improve scripts with Google Gemini or Groq
@@ -319,4 +327,3 @@ print(f"Job created: {job_id}")
 ---
 
 Made with ❤️ using free and open-source AI services
-

@@ -117,4 +117,3 @@ Total: 2-5 minutes ⏱️
 ---
 
 **Need Help?** Check [GitHub Issues](https://github.com/jeff99jackson99/ai-video-generator/issues)
-

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +29,7 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .card {
@@ -36,7 +37,7 @@
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .back-link {
@@ -45,14 +46,14 @@
             text-decoration: none;
             margin-bottom: 20px;
             padding: 10px 20px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             font-weight: 600;
             transition: background 0.3s;
         }
 
         .back-link:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .form-group {
@@ -94,7 +95,8 @@
             color: #155724;
         }
 
-        input[type="text"], input[type="password"] {
+        input[type="text"],
+        input[type="password"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -196,12 +198,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <a href="index.html" class="back-link">← Back to Generator</a>
-        
+
         <h1>⚙️ Settings</h1>
-        
+
         <div class="card">
             <div class="info-box">
                 <h3>🔒 Privacy & Security</h3>
@@ -220,11 +223,13 @@
                     <div class="label-with-badge">
                         <label for="geminiKey">Google Gemini API Key</label>
                         <span class="badge badge-free">FREE TIER</span>
-                        <span class="badge badge-configured" id="geminiStatus" style="display: none;">✓ Configured</span>
+                        <span class="badge badge-configured" id="geminiStatus" style="display: none;">✓
+                            Configured</span>
                     </div>
                     <input type="password" id="geminiKey" name="gemini_api_key" placeholder="Your Gemini API key">
                     <div class="help-text">
-                        Get your free key: <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
+                        Get your free key: <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI
+                            Studio</a>
                     </div>
                 </div>
 
@@ -249,7 +254,8 @@
                     <div class="label-with-badge">
                         <label for="pexelsKey">Pexels API Key</label>
                         <span class="badge badge-free">FREE</span>
-                        <span class="badge badge-configured" id="pexelsStatus" style="display: none;">✓ Configured</span>
+                        <span class="badge badge-configured" id="pexelsStatus" style="display: none;">✓
+                            Configured</span>
                     </div>
                     <input type="password" id="pexelsKey" name="pexels_api_key" placeholder="Your Pexels API key">
                     <div class="help-text">
@@ -261,11 +267,14 @@
                     <div class="label-with-badge">
                         <label for="unsplashKey">Unsplash API Key</label>
                         <span class="badge badge-free">FREE</span>
-                        <span class="badge badge-configured" id="unsplashStatus" style="display: none;">✓ Configured</span>
+                        <span class="badge badge-configured" id="unsplashStatus" style="display: none;">✓
+                            Configured</span>
                     </div>
-                    <input type="password" id="unsplashKey" name="unsplash_api_key" placeholder="Your Unsplash Access Key">
+                    <input type="password" id="unsplashKey" name="unsplash_api_key"
+                        placeholder="Your Unsplash Access Key">
                     <div class="help-text">
-                        Get your free key: <a href="https://unsplash.com/developers" target="_blank">Unsplash Developers</a>
+                        Get your free key: <a href="https://unsplash.com/developers" target="_blank">Unsplash
+                            Developers</a>
                     </div>
                 </div>
 
@@ -273,7 +282,8 @@
                     <div class="label-with-badge">
                         <label for="pixabayKey">Pixabay API Key</label>
                         <span class="badge badge-free">FREE</span>
-                        <span class="badge badge-configured" id="pixabayStatus" style="display: none;">✓ Configured</span>
+                        <span class="badge badge-configured" id="pixabayStatus" style="display: none;">✓
+                            Configured</span>
                     </div>
                     <input type="password" id="pixabayKey" name="pixabay_api_key" placeholder="Your Pixabay API key">
                     <div class="help-text">
@@ -299,7 +309,7 @@
 
     <script>
         // Load current settings on page load
-        window.addEventListener('load', async function() {
+        window.addEventListener('load', async function () {
             try {
                 const response = await fetch('/api/settings');
                 const data = await response.json();
@@ -316,7 +326,7 @@
         });
 
         // Form submission
-        document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+        document.getElementById('settingsForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const settings = {
@@ -329,7 +339,7 @@
 
             try {
                 document.getElementById('saveBtn').disabled = true;
-                
+
                 const response = await fetch('/api/settings', {
                     method: 'POST',
                     headers: {
@@ -368,5 +378,5 @@
         }
     </script>
 </body>
-</html>
 
+</html>

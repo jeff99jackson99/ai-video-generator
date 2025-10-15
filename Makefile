@@ -43,4 +43,3 @@ docker/build:
 
 docker/run:
 	docker run -p 8000:8000 -v $(PWD)/data:/app/data -v $(PWD)/output:/app/output --env-file .env ai-video-generator:latest
-
