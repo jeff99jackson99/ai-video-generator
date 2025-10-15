@@ -86,9 +86,9 @@ class VideoGenerator:
                 final_audio = CompositeAudioClip([voiceover_audio, music_audio])
             else:
                 final_audio = voiceover_audio
-
-            # Set audio to video
-            final_video = final_video.set_audio(final_audio)
+            
+            # Set audio to video (MoviePy 2.x uses with_audio instead of set_audio)
+            final_video = final_video.with_audio(final_audio)
 
             if progress_callback:
                 progress_callback(70)
@@ -223,12 +223,12 @@ class VideoGenerator:
                     align='center'
                 )
 
-                # Position caption
+                # Position caption (MoviePy 2.x uses with_position instead of set_position)
                 position = caption.get('position', ('center', 'bottom'))
-                txt_clip = txt_clip.set_position(position)
-
-                # Set timing
-                txt_clip = txt_clip.set_start(start).set_duration(duration)
+                txt_clip = txt_clip.with_position(position)
+                
+                # Set timing (MoviePy 2.x uses with_start and with_duration)
+                txt_clip = txt_clip.with_start(start).with_duration(duration)
 
                 # Add fade in/out for smooth caption appearance
                 txt_clip = txt_clip.with_effects([
