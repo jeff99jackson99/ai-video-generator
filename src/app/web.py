@@ -38,6 +38,7 @@ app.add_middleware(
 # Initialize services
 job_manager = JobManager(Config.DATA_DIR)
 script_enhancer = ScriptEnhancer(
+    openai_api_key=Config.OPENAI_API_KEY,
     gemini_api_key=Config.GEMINI_API_KEY,
     groq_api_key=Config.GROQ_API_KEY
 )
@@ -76,6 +77,7 @@ class GenerateRequest(BaseModel):
 
 
 class SettingsRequest(BaseModel):
+    openai_api_key: Optional[str] = None
     gemini_api_key: Optional[str] = None
     groq_api_key: Optional[str] = None
     pexels_api_key: Optional[str] = None
@@ -219,6 +221,8 @@ async def save_settings(settings: SettingsRequest):
         settings_file.write_text(json.dumps(encrypted_settings, indent=2))
 
         # Update current session
+        if settings.openai_api_key:
+            Config.OPENAI_API_KEY = settings.openai_api_key
         if settings.gemini_api_key:
             Config.GEMINI_API_KEY = settings.gemini_api_key
         if settings.groq_api_key:
@@ -229,10 +233,11 @@ async def save_settings(settings: SettingsRequest):
             Config.UNSPLASH_API_KEY = settings.unsplash_api_key
         if settings.pixabay_api_key:
             Config.PIXABAY_API_KEY = settings.pixabay_api_key
-
+        
         # Reinitialize services with new keys
         global script_enhancer, media_fetcher, music_selector
         script_enhancer = ScriptEnhancer(
+            openai_api_key=Config.OPENAI_API_KEY,
             gemini_api_key=Config.GEMINI_API_KEY,
             groq_api_key=Config.GROQ_API_KEY
         )
@@ -260,16 +265,18 @@ async def get_settings():
 
     if not settings_file.exists():
         return {
+            "has_openai": bool(Config.OPENAI_API_KEY),
             "has_gemini": bool(Config.GEMINI_API_KEY),
             "has_groq": bool(Config.GROQ_API_KEY),
             "has_pexels": bool(Config.PEXELS_API_KEY),
             "has_unsplash": bool(Config.UNSPLASH_API_KEY),
             "has_pixabay": bool(Config.PIXABAY_API_KEY)
         }
-
+    
     encrypted_settings = json.loads(settings_file.read_text())
-
+    
     return {
+        "has_openai": "openai_api_key" in encrypted_settings,
         "has_gemini": "gemini_api_key" in encrypted_settings,
         "has_groq": "groq_api_key" in encrypted_settings,
         "has_pexels": "pexels_api_key" in encrypted_settings,

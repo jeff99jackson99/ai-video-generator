@@ -7,20 +7,24 @@ import httpx
 
 class ScriptEnhancer:
     """Enhances scripts using AI models."""
-
+    
     def __init__(
         self,
+        openai_api_key: Optional[str] = None,
         gemini_api_key: Optional[str] = None,
         groq_api_key: Optional[str] = None
     ):
         """Initialize script enhancer."""
+        self.openai_api_key = openai_api_key
         self.gemini_api_key = gemini_api_key
         self.groq_api_key = groq_api_key
 
     async def enhance_script(self, script: str) -> Dict[str, Any]:
         """
-        Enhance script with AI suggestions.
-
+        Enhance script with AI - tries best models first.
+        
+        Priority: OpenAI GPT-4 > Gemini > Groq > Basic
+        
         Returns:
             {
                 "enhanced_script": str,
@@ -30,23 +34,90 @@ class ScriptEnhancer:
                 "duration_estimate": int
             }
         """
-        # Try Gemini first if API key is available
+        # Try OpenAI GPT-4 first (best quality) if API key is available
+        if self.openai_api_key:
+            try:
+                print("🤖 Using OpenAI GPT-4 for script enhancement...")
+                return await self._enhance_with_openai(script)
+            except Exception as e:
+                print(f"OpenAI API error: {e}, falling back to Gemini")
+        
+        # Try Gemini as second choice
         if self.gemini_api_key:
             try:
+                print("🤖 Using Google Gemini for script enhancement...")
                 return await self._enhance_with_gemini(script)
             except Exception as e:
                 print(f"Gemini API error: {e}, falling back to Groq")
-
-        # Try Groq as fallback
+        
+        # Try Groq as third choice (fast and free)
         if self.groq_api_key:
             try:
+                print("🤖 Using Groq for script enhancement...")
                 return await self._enhance_with_groq(script)
             except Exception as e:
                 print(f"Groq API error: {e}, using basic enhancement")
-
-        # Basic enhancement without AI
+        
+        # Basic enhancement without AI (fallback)
+        print("ℹ️ Using basic enhancement (no API keys configured)")
         return self._basic_enhancement(script)
+    
+    async def _enhance_with_openai(self, script: str) -> Dict[str, Any]:
+        """Enhance script using OpenAI GPT-4 (best quality)."""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.openai_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "gpt-4o-mini",  # Fast and cost-effective GPT-4
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a professional video script writer and content strategist. You enhance scripts to be more engaging, visual, and impactful. Return responses in valid JSON format only."
+                        },
+                        {
+                            "role": "user",
+                            "content": f"""Analyze and enhance this video script:
 
+{script}
+
+Provide a comprehensive analysis in this EXACT JSON format:
+{{
+    "enhanced_script": "An improved, more engaging version with better pacing and clarity",
+    "scenes": [
+        {{
+            "text": "Scene narration text",
+            "visual_description": "Detailed description of what visuals to show",
+            "duration": 5
+        }}
+    ],
+    "keywords": ["keyword1", "keyword2", "keyword3"],
+    "mood": "inspirational/professional/upbeat/calm/dramatic/educational",
+    "duration_estimate": 90
+}}
+
+Make the enhanced script more impactful and visual. Break it into well-paced scenes. Extract specific visual keywords that would make great imagery."""
+                        }
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 2000,
+                    "response_format": {"type": "json_object"}
+                },
+                timeout=30.0
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            import json
+            content = data['choices'][0]['message']['content']
+            result = json.loads(content)
+            
+            print(f"✅ OpenAI GPT-4 enhanced script successfully!")
+            return result
+    
     async def _enhance_with_gemini(self, script: str) -> Dict[str, Any]:
         """Enhance script using Google Gemini API."""
         try:
