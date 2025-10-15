@@ -233,7 +233,7 @@ async def save_settings(settings: SettingsRequest):
             Config.UNSPLASH_API_KEY = settings.unsplash_api_key
         if settings.pixabay_api_key:
             Config.PIXABAY_API_KEY = settings.pixabay_api_key
-        
+
         # Reinitialize services with new keys
         global script_enhancer, media_fetcher, music_selector
         script_enhancer = ScriptEnhancer(
@@ -272,9 +272,9 @@ async def get_settings():
             "has_unsplash": bool(Config.UNSPLASH_API_KEY),
             "has_pixabay": bool(Config.PIXABAY_API_KEY)
         }
-    
+
     encrypted_settings = json.loads(settings_file.read_text())
-    
+
     return {
         "has_openai": "openai_api_key" in encrypted_settings,
         "has_gemini": "gemini_api_key" in encrypted_settings,

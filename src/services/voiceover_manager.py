@@ -34,19 +34,29 @@ class VoiceoverManager:
         voice: str = "default",
         use_gtts: bool = True
     ) -> Path:
-        """Generate text-to-speech audio."""
+        """Generate text-to-speech audio with proper voice selection."""
         filename = f"{job_id}_tts.mp3"
         file_path = self.storage_dir / filename
-
+        
+        # Try Coqui TTS first for better quality and voice control
+        try:
+            print(f"🎙️ Generating voiceover with Coqui TTS (voice: {voice})...")
+            return await self._generate_coqui_tts(text, file_path, voice)
+        except Exception as e:
+            print(f"Coqui TTS not available: {e}, using gTTS")
+        
+        # Fallback to gTTS
         if use_gtts:
-            # Use gTTS (Google Text-to-Speech) - free and simple
             try:
                 from gtts import gTTS
+                # gTTS doesn't support voice selection well, but works
+                print(f"🎙️ Generating voiceover with gTTS...")
                 tts = gTTS(text=text, lang='en', slow=False)
                 tts.save(str(file_path))
+                print(f"✅ Voiceover generated with gTTS")
                 return file_path
             except Exception as e:
-                print(f"gTTS error: {e}, trying Coqui TTS")
+                print(f"gTTS error: {e}")
 
         # Try Coqui TTS as alternative
         try:
@@ -62,17 +72,33 @@ class VoiceoverManager:
         output_path: Path,
         voice: str
     ) -> Path:
-        """Generate TTS using Coqui TTS (high quality, open source)."""
+        """Generate TTS using Coqui TTS with male/female voice selection."""
         try:
             from TTS.api import TTS
-
-            # Initialize TTS with a free model
-            tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False)
-
+            
+            # Select model based on voice preference
+            if voice == "female":
+                model_name = "tts_models/en/ljspeech/tacotron2-DDC"
+            elif voice == "male":
+                # Use multi-speaker model for male voice
+                model_name = "tts_models/en/vctk/vits"
+                speaker = "p226"  # Male speaker
+            else:
+                # Default to female
+                model_name = "tts_models/en/ljspeech/tacotron2-DDC"
+            
+            print(f"🎙️ Loading Coqui TTS model: {model_name}...")
+            tts = TTS(model_name=model_name, progress_bar=False, gpu=False)
+            
             # Generate speech
-            tts.tts_to_file(text=text, file_path=str(output_path))
+            if voice == "male" and model_name == "tts_models/en/vctk/vits":
+                tts.tts_to_file(text=text, file_path=str(output_path), speaker=speaker)
+            else:
+                tts.tts_to_file(text=text, file_path=str(output_path))
+            
+            print(f"✅ High-quality voiceover generated!")
             return output_path
-
+            
         except Exception as e:
             raise Exception(f"Coqui TTS generation failed: {e}")
 

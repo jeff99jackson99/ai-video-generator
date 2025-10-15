@@ -86,7 +86,7 @@ class VideoGenerator:
                 final_audio = CompositeAudioClip([voiceover_audio, music_audio])
             else:
                 final_audio = voiceover_audio
-            
+
             # Set audio to video (MoviePy 2.x uses with_audio instead of set_audio)
             final_video = final_video.with_audio(final_audio)
 
@@ -202,31 +202,31 @@ class VideoGenerator:
             end = caption['end_time']
             duration = end - start
 
-            # Get caption style
-            fontsize = caption.get('fontsize', 70)
+            # Get caption style (MoviePy 2.x parameter names)
+            font_size = caption.get('font_size', 70)
             color = caption.get('color', 'white')
             stroke_color = caption.get('stroke_color', 'black')
             stroke_width = caption.get('stroke_width', 3)
-            font = caption.get('font', 'Arial-Bold')
-
-            # Create text clip
+            font = caption.get('font', '/System/Library/Fonts/Helvetica.ttc')
+            
+            # Create text clip with MoviePy 2.x parameters
             try:
                 txt_clip = TextClip(
-                    text,
-                    fontsize=fontsize,
+                    text=text,
+                    font_size=font_size,
                     color=color,
                     font=font,
-                    stroke_color=stroke_color if stroke_color != 'none' else None,
-                    stroke_width=stroke_width,
+                    stroke_color=stroke_color if stroke_color and stroke_color != 'none' else None,
+                    stroke_width=stroke_width if stroke_color and stroke_color != 'none' else 0,
                     method='caption',
-                    size=(self.resolution[0] * 0.9, None),
-                    align='center'
+                    size=(int(self.resolution[0] * 0.9), None),
+                    text_align='center'
                 )
 
                 # Position caption (MoviePy 2.x uses with_position instead of set_position)
                 position = caption.get('position', ('center', 'bottom'))
                 txt_clip = txt_clip.with_position(position)
-                
+
                 # Set timing (MoviePy 2.x uses with_start and with_duration)
                 txt_clip = txt_clip.with_start(start).with_duration(duration)
 

@@ -7,7 +7,7 @@ import httpx
 
 class ScriptEnhancer:
     """Enhances scripts using AI models."""
-    
+
     def __init__(
         self,
         openai_api_key: Optional[str] = None,
@@ -22,9 +22,9 @@ class ScriptEnhancer:
     async def enhance_script(self, script: str) -> Dict[str, Any]:
         """
         Enhance script with AI - tries best models first.
-        
+
         Priority: OpenAI GPT-4 > Gemini > Groq > Basic
-        
+
         Returns:
             {
                 "enhanced_script": str,
@@ -41,7 +41,7 @@ class ScriptEnhancer:
                 return await self._enhance_with_openai(script)
             except Exception as e:
                 print(f"OpenAI API error: {e}, falling back to Gemini")
-        
+
         # Try Gemini as second choice
         if self.gemini_api_key:
             try:
@@ -49,7 +49,7 @@ class ScriptEnhancer:
                 return await self._enhance_with_gemini(script)
             except Exception as e:
                 print(f"Gemini API error: {e}, falling back to Groq")
-        
+
         # Try Groq as third choice (fast and free)
         if self.groq_api_key:
             try:
@@ -57,11 +57,11 @@ class ScriptEnhancer:
                 return await self._enhance_with_groq(script)
             except Exception as e:
                 print(f"Groq API error: {e}, using basic enhancement")
-        
+
         # Basic enhancement without AI (fallback)
         print("ℹ️ Using basic enhancement (no API keys configured)")
         return self._basic_enhancement(script)
-    
+
     async def _enhance_with_openai(self, script: str) -> Dict[str, Any]:
         """Enhance script using OpenAI GPT-4 (best quality)."""
         async with httpx.AsyncClient() as client:
@@ -110,14 +110,14 @@ Make the enhanced script more impactful and visual. Break it into well-paced sce
             )
             response.raise_for_status()
             data = response.json()
-            
+
             import json
             content = data['choices'][0]['message']['content']
             result = json.loads(content)
-            
+
             print(f"✅ OpenAI GPT-4 enhanced script successfully!")
             return result
-    
+
     async def _enhance_with_gemini(self, script: str) -> Dict[str, Any]:
         """Enhance script using Google Gemini API."""
         try:
@@ -219,14 +219,19 @@ Return ONLY valid JSON in this format:
         sentences = re.split(r'[.!?]+', script)
         sentences = [s.strip() for s in sentences if s.strip()]
 
-        # Create basic scenes (one per sentence or two)
+        # Create basic scenes (one or two sentences per scene)
+        # Make scenes longer for better viewing
         scenes = []
         for i in range(0, len(sentences), 2):
             scene_text = ". ".join(sentences[i:i+2]) + "."
+            # Calculate duration based on text length (reading pace: ~3 words/second)
+            word_count = len(scene_text.split())
+            duration = max(6, min(12, word_count / 2.5))  # 6-12 seconds per scene
+            
             scenes.append({
                 "text": scene_text,
                 "visual_description": f"Visual for: {scene_text[:50]}...",
-                "duration": 5
+                "duration": duration
             })
 
         # Extract simple keywords (nouns and important words)

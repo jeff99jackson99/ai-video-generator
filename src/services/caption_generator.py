@@ -147,53 +147,56 @@ class CaptionGenerator:
 
     def get_caption_style_config(self, style: str = "modern") -> Dict[str, any]:
         """
-        Get caption styling configuration for MoviePy.
-
+        Get caption styling configuration for MoviePy with macOS-compatible fonts.
+        
         Styles: modern, classic, minimal, bold
         """
+        # Use full paths to macOS system fonts for compatibility
+        helvetica_font = "/System/Library/Fonts/Helvetica.ttc"
+        
         styles = {
             "modern": {
-                "fontsize": 70,
+                "font_size": 70,
                 "color": "white",
                 "stroke_color": "black",
                 "stroke_width": 3,
-                "font": "Arial-Bold",
+                "font": helvetica_font,
                 "method": "caption",
-                "align": "center",
+                "text_align": "center",
                 "bg_color": "transparent"
             },
             "classic": {
-                "fontsize": 50,
+                "font_size": 60,
                 "color": "yellow",
                 "stroke_color": "black",
                 "stroke_width": 2,
-                "font": "Arial",
+                "font": helvetica_font,
                 "method": "caption",
-                "align": "center",
+                "text_align": "center",
                 "bg_color": "transparent"
             },
             "minimal": {
-                "fontsize": 60,
+                "font_size": 65,
                 "color": "white",
-                "stroke_color": "none",
+                "stroke_color": None,
                 "stroke_width": 0,
-                "font": "Helvetica",
+                "font": helvetica_font,
                 "method": "caption",
-                "align": "center",
+                "text_align": "center",
                 "bg_color": "transparent"
             },
             "bold": {
-                "fontsize": 80,
+                "font_size": 80,
                 "color": "white",
                 "stroke_color": "black",
                 "stroke_width": 4,
-                "font": "Impact",
+                "font": helvetica_font,
                 "method": "caption",
-                "align": "center",
-                "bg_color": "rgba(0,0,0,0.5)"
+                "text_align": "center",
+                "bg_color": "transparent"
             }
         }
-
+        
         return styles.get(style, styles["modern"])
 
     def prepare_captions_for_video(

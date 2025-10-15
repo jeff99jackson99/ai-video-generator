@@ -34,5 +34,41 @@
     "progress": 10,
     "error": "Video generation failed: 'ImageClip' object has no attribute 'fx'",
     "output_file": null
+  },
+  "8cabdc7e-5b61-48b3-af99-ae58375e06c5": {
+    "job_id": "8cabdc7e-5b61-48b3-af99-ae58375e06c5",
+    "status": "failed",
+    "script": "You might think you\u2019ve gone too far for God to forgive you. But the truth is, He already made a way before you even asked.\r\n\r\nWe\u2019ve all messed up. Lied. Hurt people. Walked our own way. Sin isn\u2019t just bad choices\u2014it\u2019s separation from the God who made us. And no matter how hard we try, we can\u2019t fix that on our own.\r\n\r\nBut God didn\u2019t wait for us to reach Him. He came down to us in Jesus Christ. Jesus took our punishment on the cross, died, and rose again\u2014defeating death itself. That\u2019s not religion. That\u2019s rescue.\r\n\r\nYou don\u2019t earn it. You just believe it. \u201cEveryone who calls on the name of the Lord will be saved.\u201d (Romans 10:13)\r\n\r\nIf you\u2019re ready, say, \u201cJesus, I believe You died for me. Forgive me. Make me new.\u201d\r\n\r\nYou\u2019re not too far gone. You\u2019re the reason He came.",
+    "options": {
+      "use_tts": true,
+      "voice": "male",
+      "add_captions": true,
+      "caption_style": "modern",
+      "add_music": true,
+      "mood": "professional"
+    },
+    "created_at": "2025-10-15T03:55:19.542796",
+    "updated_at": "2025-10-15T03:55:56.184725",
+    "progress": 50,
+    "error": "Video generation failed: 'CompositeVideoClip' object has no attribute 'set_audio'",
+    "output_file": null
+  },
+  "aac6431c-e7af-495a-ba77-36e96877925c": {
+    "job_id": "aac6431c-e7af-495a-ba77-36e96877925c",
+    "status": "completed",
+    "script": "You might think you\u2019ve gone too far for God to forgive you. But the truth is, He already made a way before you even asked.\r\n\r\nWe\u2019ve all messed up. Lied. Hurt people. Walked our own way. Sin isn\u2019t just bad choices\u2014it\u2019s separation from the God who made us. And no matter how hard we try, we can\u2019t fix that on our own.\r\n\r\nBut God didn\u2019t wait for us to reach Him. He came down to us in Jesus Christ. Jesus took our punishment on the cross, died, and rose again\u2014defeating death itself. That\u2019s not religion. That\u2019s rescue.\r\n\r\nYou don\u2019t earn it. You just believe it. \u201cEveryone who calls on the name of the Lord will be saved.\u201d (Romans 10:13)\r\n\r\nIf you\u2019re ready, say, \u201cJesus, I believe You died for me. Forgive me. Make me new.\u201d\r\n\r\nYou\u2019re not too far gone. You\u2019re the reason He came.",
+    "options": {
+      "use_tts": true,
+      "voice": "male",
+      "add_captions": true,
+      "caption_style": "modern",
+      "add_music": true,
+      "mood": "professional"
+    },
+    "created_at": "2025-10-15T04:00:22.265735",
+    "updated_at": "2025-10-15T04:01:53.449390",
+    "progress": 100,
+    "error": null,
+    "output_file": "output/aac6431c-e7af-495a-ba77-36e96877925c_video.mp4"
   }
 }
