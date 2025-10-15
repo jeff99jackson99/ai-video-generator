@@ -88,5 +88,23 @@
     "progress": 100,
     "error": null,
     "output_file": "output/86788e78-3fcb-4dd0-ac31-99977b266d4f_video.mp4"
+  },
+  "b5b5d63e-9ba7-4c2e-968f-d054639dc4bc": {
+    "job_id": "b5b5d63e-9ba7-4c2e-968f-d054639dc4bc",
+    "status": "failed",
+    "script": "Imagine this,\r\nyou\u2019re smiling in photos, but you feel empty inside.\r\nYou\u2019ve chased success, love, pleasure,\r\nbut somehow, it\u2019s never enough.\r\n\r\nYou scroll, you laugh, you post,\r\nbut when it\u2019s quiet, the weight hits.\r\nSomething\u2019s missing.\r\n\r\nThat missing piece isn\u2019t a thing, it\u2019s a Person.\r\nThe One who made you.\r\nThe One you\u2019ve been running from since the start,\r\nand still, He\u2019s been running toward you.\r\n\r\nHis name is Jesus.\r\nHe saw your sin, your shame, your secret thoughts,\r\nand loved you anyway.\r\nHe went to the cross to pay for it all.\r\nThree days later, He walked out of the grave,\r\nalive.\r\n\r\nAnd now, He\u2019s calling your name,\r\nnot to judge you,\r\nto save you.\r\n\r\nYou don\u2019t have to clean yourself up,\r\nyou just have to come.\r\n\u201cEveryone who calls on the name of the Lord will be saved.\u201d (Romans 10:13)\r\n\r\nThis isn\u2019t just a story,\r\nthis is your invitation.\r\nLife, freedom, forgiveness,\r\nit\u2019s all waiting for you.",
+    "options": {
+      "use_tts": true,
+      "voice": "male",
+      "add_captions": true,
+      "caption_style": "modern",
+      "add_music": true,
+      "mood": "professional"
+    },
+    "created_at": "2025-10-15T04:17:35.893122",
+    "updated_at": "2025-10-15T04:18:04.703937",
+    "progress": 10,
+    "error": "Video generation failed: 'VideoFileClip' object has no attribute 'subclip'",
+    "output_file": null
   }
 }

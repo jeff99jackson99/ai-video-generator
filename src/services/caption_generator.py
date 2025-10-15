@@ -62,21 +62,21 @@ class CaptionGenerator:
                 # Group words into readable phrases (2-4 words each)
                 phrases = []
                 current_phrase = []
-                
+
                 for word in words:
                     current_phrase.append(word)
                     # Create phrase every 2-4 words or at punctuation
                     if len(current_phrase) >= 3 or word.endswith((',', '.', '!', '?')):
                         phrases.append(' '.join(current_phrase))
                         current_phrase = []
-                
+
                 # Add remaining words
                 if current_phrase:
                     phrases.append(' '.join(current_phrase))
-                
+
                 # Calculate timing for phrases (better readability)
                 phrase_duration = scene_duration / len(phrases) if phrases else scene_duration
-                
+
                 for j, phrase in enumerate(phrases):
                     caption = {
                         'text': phrase,
@@ -165,12 +165,12 @@ class CaptionGenerator:
     def get_caption_style_config(self, style: str = "modern") -> Dict[str, any]:
         """
         Get caption styling configuration for MoviePy with macOS-compatible fonts.
-        
+
         Styles: modern, classic, minimal, bold
         """
         # Use full paths to macOS system fonts for compatibility
         helvetica_font = "/System/Library/Fonts/Helvetica.ttc"
-        
+
         styles = {
             "modern": {
                 "font_size": 70,
@@ -213,7 +213,7 @@ class CaptionGenerator:
                 "bg_color": "transparent"
             }
         }
-        
+
         return styles.get(style, styles["modern"])
 
     def prepare_captions_for_video(

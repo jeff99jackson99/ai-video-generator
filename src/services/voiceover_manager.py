@@ -37,21 +37,21 @@ class VoiceoverManager:
         """Generate text-to-speech with natural-sounding voices."""
         filename = f"{job_id}_tts.mp3"
         file_path = self.storage_dir / filename
-        
+
         # Try Edge TTS first - FREE Microsoft voices, very natural!
         try:
             print(f"🎙️ Generating voiceover with Edge TTS (Microsoft) - Natural {voice} voice...")
             return await self._generate_edge_tts(text, file_path, voice)
         except Exception as e:
             print(f"Edge TTS error: {e}, trying Coqui TTS")
-        
+
         # Try Coqui TTS second
         try:
             print(f"🎙️ Generating voiceover with Coqui TTS (voice: {voice})...")
             return await self._generate_coqui_tts(text, file_path, voice)
         except Exception as e:
             print(f"Coqui TTS not available: {e}, using gTTS")
-        
+
         # Fallback to gTTS (robotic but reliable)
         if use_gtts:
             try:
@@ -71,7 +71,7 @@ class VoiceoverManager:
             print(f"Coqui TTS error: {e}")
         # If all fail, create silent audio as fallback
         return await self._create_silent_audio(file_path, duration=5)
-    
+
     async def _generate_edge_tts(
         self,
         text: str,
@@ -80,33 +80,47 @@ class VoiceoverManager:
     ) -> Path:
         """
         Generate TTS using Microsoft Edge TTS (FREE, very natural voices).
-        
+
         Edge TTS voices are 100% free and sound like real people!
         """
         try:
             import edge_tts
             
-            # Select natural voice based on preference
+            # Professional voice selection - Microsoft Edge TTS (sounds like real people!)
             voice_map = {
-                "male": "en-US-GuyNeural",  # Natural American male
-                "female": "en-US-AriaNeural",  # Natural American female
-                "default": "en-US-GuyNeural"
+                # Male voices (professional, natural)
+                "male": "en-US-GuyNeural",  # Deep, authoritative American male
+                "male-young": "en-US-EricNeural",  # Young, energetic male
+                "male-british": "en-GB-RyanNeural",  # British accent, professional
+                "male-calm": "en-US-DavisNeural",  # Calm, soothing male
+                "male-narrator": "en-US-BrandonNeural",  # Professional narrator
+                
+                # Female voices (warm, clear)
+                "female": "en-US-AriaNeural",  # Clear, professional female
+                "female-warm": "en-US-JennyNeural",  # Warm, friendly female
+                "female-british": "en-GB-SoniaNeural",  # British accent, elegant
+                "female-narrator": "en-US-SaraNeural",  # Professional narrator
+                
+                # Special voices
+                "default": "en-US-GuyNeural",  # Default to male
+                "narrator-male": "en-US-BrandonNeural",  # Best for narration
+                "narrator-female": "en-US-SaraNeural"  # Best for female narration
             }
             
-            edge_voice = voice_map.get(voice, voice_map["male"])
-            
+            edge_voice = voice_map.get(voice.lower(), voice_map["male"])
+
             print(f"🎙️ Using Microsoft Edge TTS voice: {edge_voice} (sounds like real person!)")
-            
+
             # Generate speech
             communicate = edge_tts.Communicate(text, edge_voice)
             await communicate.save(str(output_path))
-            
+
             print(f"✅ Natural voiceover generated with Edge TTS!")
             return output_path
-            
+
         except Exception as e:
             raise Exception(f"Edge TTS generation failed: {e}")
-    
+
     async def _generate_coqui_tts(
         self,
         text: str,
@@ -116,7 +130,7 @@ class VoiceoverManager:
         """Generate TTS using Coqui TTS with male/female voice selection."""
         try:
             from TTS.api import TTS
-            
+
             # Select model based on voice preference
             if voice == "female":
                 model_name = "tts_models/en/ljspeech/tacotron2-DDC"
@@ -127,19 +141,19 @@ class VoiceoverManager:
             else:
                 # Default to female
                 model_name = "tts_models/en/ljspeech/tacotron2-DDC"
-            
+
             print(f"🎙️ Loading Coqui TTS model: {model_name}...")
             tts = TTS(model_name=model_name, progress_bar=False, gpu=False)
-            
+
             # Generate speech
             if voice == "male" and model_name == "tts_models/en/vctk/vits":
                 tts.tts_to_file(text=text, file_path=str(output_path), speaker=speaker)
             else:
                 tts.tts_to_file(text=text, file_path=str(output_path))
-            
+
             print(f"✅ High-quality voiceover generated!")
             return output_path
-            
+
         except Exception as e:
             raise Exception(f"Coqui TTS generation failed: {e}")
 

@@ -339,7 +339,7 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=20)
         print(f"📸 Fetching {len(scenes)} media files (photos + video clips) from Pexels...")
         job_manager.update_job(job_id, progress=25)
-        
+
         media_files = await media_fetcher.search_and_download(
             keywords,
             count=len(scenes),

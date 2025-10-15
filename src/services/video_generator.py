@@ -162,15 +162,15 @@ class VideoGenerator:
 
             # Create clip based on media type
             if media_path.suffix.lower() in ['.mp4', '.mov', '.avi']:
-                # Video file
+                # Video file - MoviePy 2.x uses subclipped() not subclip()
                 clip = VideoFileClip(str(media_path))
                 # Take only the needed duration
-                clip = clip.subclip(0, min(duration, clip.duration))
+                clip = clip.subclipped(0, min(duration, clip.duration))
                 if clip.duration < duration:
                     # Loop if video is too short
                     loops = int(duration / clip.duration) + 1
                     clip = concatenate_videoclips([clip] * loops)
-                    clip = clip.subclip(0, duration)
+                    clip = clip.subclipped(0, duration)
             else:
                 # Image file
                 clip = ImageClip(str(media_path), duration=duration)
@@ -279,7 +279,7 @@ class VideoGenerator:
         for media_path in media_files[:5]:  # Max 5 clips for preview
             if media_path.suffix.lower() in ['.mp4', '.mov', '.avi']:
                 clip = VideoFileClip(str(media_path))
-                clip = clip.subclip(0, min(clip_duration, clip.duration))
+                clip = clip.subclipped(0, min(clip_duration, clip.duration))
             else:
                 clip = ImageClip(str(media_path), duration=clip_duration)
 
