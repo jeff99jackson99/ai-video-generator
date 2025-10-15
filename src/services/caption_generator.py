@@ -24,7 +24,7 @@ class CaptionGenerator:
         Returns list of caption segments with timestamps.
         """
         print(f"🎤 Transcribing audio with Whisper for accurate caption timing...")
-        
+
         try:
             # ALWAYS use Whisper for accurate timing
             captions = await self._transcribe_with_whisper(audio_path)
@@ -98,7 +98,7 @@ class CaptionGenerator:
     ) -> List[Dict[str, any]]:
         """
         Transcribe audio using OpenAI Whisper with phrase-based grouping.
-        
+
         Groups words into 2-4 word phrases for better readability.
         """
         try:
@@ -107,7 +107,7 @@ class CaptionGenerator:
 
             # Load Whisper model in thread pool (blocking operation)
             loop = asyncio.get_event_loop()
-            
+
             def load_and_transcribe():
                 print(f"   Loading Whisper base model...")
                 model = whisper.load_model("base")  # Fast, accurate
@@ -118,49 +118,49 @@ class CaptionGenerator:
                     language="en",
                     fp16=False  # CPU compatibility
                 )
-            
+
             # Run in thread pool to avoid blocking
             result = await loop.run_in_executor(None, load_and_transcribe)
 
             captions = []
-            
+
             # Group words into phrases for better readability
             for segment in result.get('segments', []):
                 if 'words' in segment:
                     words = segment['words']
-                    
+
                     # Group words into phrases (2-4 words each)
                     phrase_buffer = []
                     phrase_start = None
-                    
+
                     for i, word_data in enumerate(words):
                         word = word_data['word'].strip()
-                        
+
                         if not phrase_start:
                             phrase_start = word_data['start']
-                        
+
                         phrase_buffer.append(word)
-                        
+
                         # Create phrase every 3 words or at punctuation
                         is_punctuation = word.endswith(('.', ',', '!', '?', ';'))
                         is_phrase_complete = len(phrase_buffer) >= 3 or is_punctuation
                         is_last_word = i == len(words) - 1
-                        
+
                         if is_phrase_complete or is_last_word:
                             phrase_text = ' '.join(phrase_buffer)
                             phrase_end = word_data['end']
-                            
+
                             captions.append({
                                 'text': phrase_text,
                                 'start_time': phrase_start,
                                 'end_time': phrase_end,
                                 'style': 'phrase'
                             })
-                            
+
                             # Reset for next phrase
                             phrase_buffer = []
                             phrase_start = None
-                
+
                 else:
                     # Fall back to segment-level (sentence-based)
                     captions.append({
@@ -211,10 +211,11 @@ class CaptionGenerator:
         """
         Get caption styling configuration for MoviePy with macOS-compatible fonts.
 
-        Styles: modern, classic, minimal, bold
+        Styles: modern, classic, minimal, bold, uppercase, lowercase, elegant, neon, shadow, outline
         """
         # Use full paths to macOS system fonts for compatibility
         helvetica_font = "/System/Library/Fonts/Helvetica.ttc"
+        impact_font = "/System/Library/Fonts/Supplemental/Impact.ttf"
 
         styles = {
             "modern": {
@@ -225,7 +226,30 @@ class CaptionGenerator:
                 "font": helvetica_font,
                 "method": "caption",
                 "text_align": "center",
-                "bg_color": "transparent"
+                "bg_color": "transparent",
+                "text_transform": None
+            },
+            "uppercase": {
+                "font_size": 75,
+                "color": "white",
+                "stroke_color": "black",
+                "stroke_width": 4,
+                "font": impact_font,
+                "method": "caption",
+                "text_align": "center",
+                "bg_color": "transparent",
+                "text_transform": "upper"
+            },
+            "lowercase": {
+                "font_size": 60,
+                "color": "white",
+                "stroke_color": "black",
+                "stroke_width": 2,
+                "font": helvetica_font,
+                "method": "caption",
+                "text_align": "center",
+                "bg_color": "transparent",
+                "text_transform": "lower"
             },
             "classic": {
                 "font_size": 60,
@@ -235,7 +259,8 @@ class CaptionGenerator:
                 "font": helvetica_font,
                 "method": "caption",
                 "text_align": "center",
-                "bg_color": "transparent"
+                "bg_color": "transparent",
+                "text_transform": None
             },
             "minimal": {
                 "font_size": 65,
@@ -245,7 +270,8 @@ class CaptionGenerator:
                 "font": helvetica_font,
                 "method": "caption",
                 "text_align": "center",
-                "bg_color": "transparent"
+                "bg_color": "transparent",
+                "text_transform": None
             },
             "bold": {
                 "font_size": 80,
@@ -255,7 +281,52 @@ class CaptionGenerator:
                 "font": helvetica_font,
                 "method": "caption",
                 "text_align": "center",
-                "bg_color": "transparent"
+                "bg_color": "transparent",
+                "text_transform": None
+            },
+            "elegant": {
+                "font_size": 65,
+                "color": "#f0f0f0",
+                "stroke_color": "#333333",
+                "stroke_width": 2,
+                "font": helvetica_font,
+                "method": "caption",
+                "text_align": "center",
+                "bg_color": "transparent",
+                "text_transform": "title"
+            },
+            "neon": {
+                "font_size": 75,
+                "color": "#00ffff",
+                "stroke_color": "#ff00ff",
+                "stroke_width": 3,
+                "font": impact_font,
+                "method": "caption",
+                "text_align": "center",
+                "bg_color": "transparent",
+                "text_transform": "upper"
+            },
+            "shadow": {
+                "font_size": 70,
+                "color": "white",
+                "stroke_color": "#000000",
+                "stroke_width": 5,
+                "font": helvetica_font,
+                "method": "caption",
+                "text_align": "center",
+                "bg_color": "transparent",
+                "text_transform": None
+            },
+            "outline": {
+                "font_size": 75,
+                "color": "black",
+                "stroke_color": "white",
+                "stroke_width": 4,
+                "font": impact_font,
+                "method": "caption",
+                "text_align": "center",
+                "bg_color": "transparent",
+                "text_transform": "upper"
             }
         }
 
@@ -288,10 +359,20 @@ class CaptionGenerator:
         }
         style_config["position"] = position_map.get(position, position_map["bottom"])
 
-        # Add style to each caption
+        # Add style to each caption and apply text transformations
         styled_captions = []
         for caption in captions:
             styled_caption = {**caption, **style_config}
+            
+            # Apply text transformation if specified
+            text_transform = style_config.get("text_transform")
+            if text_transform == "upper":
+                styled_caption["text"] = styled_caption["text"].upper()
+            elif text_transform == "lower":
+                styled_caption["text"] = styled_caption["text"].lower()
+            elif text_transform == "title":
+                styled_caption["text"] = styled_caption["text"].title()
+            
             styled_captions.append(styled_caption)
 
         return styled_captions

@@ -258,6 +258,19 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="aspectRatio">Video Format</label>
+                    <select id="aspectRatio" name="aspectRatio" style="font-size: 15px;">
+                        <option value="16:9">16:9 - YouTube, Desktop (1920x1080)</option>
+                        <option value="9:16" selected>9:16 - YouTube Shorts, TikTok, Reels (1080x1920) ⭐</option>
+                        <option value="1:1">1:1 - Instagram Square (1080x1080)</option>
+                        <option value="4:5">4:5 - Instagram Portrait (1080x1350)</option>
+                    </select>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                        📱 Vertical (9:16) is recommended for social media shorts!
+                    </p>
+                </div>
+
+                <div class="form-group">
                     <label>Voiceover Options</label>
                     <div class="checkbox-group">
                         <input type="checkbox" id="useTTS" name="useTTS" checked>
@@ -265,13 +278,18 @@
                     </div>
 
                     <div id="voiceOptions" style="margin-top: 10px;">
-                        <label for="voice">Voice Style (30+ Natural Microsoft Edge TTS Voices - FREE!)</label>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <label for="voice" style="flex: 1; margin: 0;">Voice Style (30+ Natural Voices - FREE!)</label>
+                            <button type="button" id="previewVoiceBtn" style="padding: 8px 16px; font-size: 14px;">
+                                🔊 Preview Voice
+                            </button>
+                        </div>
                         <select id="voice" name="voice" style="font-size: 15px;">
                             <optgroup label="⭐ RECOMMENDED - Professional Narrators">
                                 <option value="narrator-male">Professional Male Narrator (BEST)</option>
                                 <option value="narrator-female">Professional Female Narrator (BEST)</option>
                             </optgroup>
-                            
+
                             <optgroup label="🎙️ Male Voices - American">
                                 <option value="male">Deep & Authoritative</option>
                                 <option value="male-young">Young & Energetic</option>
@@ -280,7 +298,7 @@
                                 <option value="male-friendly">Warm & Friendly</option>
                                 <option value="storyteller-male">Engaging Storyteller</option>
                             </optgroup>
-                            
+
                             <optgroup label="👩 Female Voices - American">
                                 <option value="female">Clear & Professional</option>
                                 <option value="female-warm">Warm & Friendly</option>
@@ -289,35 +307,35 @@
                                 <option value="female-confident">Strong & Confident</option>
                                 <option value="storyteller-female">Engaging Storyteller</option>
                             </optgroup>
-                            
+
                             <optgroup label="🇬🇧 British Voices">
                                 <option value="male-british">Male - Professional British</option>
                                 <option value="male-british-calm">Male - Calm British</option>
                                 <option value="female-british">Female - Elegant British</option>
                                 <option value="female-british-warm">Female - Warm British</option>
                             </optgroup>
-                            
+
                             <optgroup label="🇦🇺 Australian Voices">
                                 <option value="male-australian">Male - Australian</option>
                                 <option value="female-australian">Female - Australian</option>
                                 <option value="female-australian-calm">Female - Calm Australian</option>
                             </optgroup>
-                            
+
                             <optgroup label="🇨🇦 Canadian Voices">
                                 <option value="male-canadian">Male - Canadian</option>
                                 <option value="female-canadian">Female - Canadian</option>
                             </optgroup>
-                            
+
                             <optgroup label="🇮🇪 Irish Voices">
                                 <option value="male-irish">Male - Irish</option>
                                 <option value="female-irish">Female - Irish</option>
                             </optgroup>
-                            
+
                             <optgroup label="🇮🇳 Indian Voices">
                                 <option value="male-indian">Male - Indian</option>
                                 <option value="female-indian">Female - Indian</option>
                             </optgroup>
-                            
+
                             <optgroup label="🇿🇦 South African Voices">
                                 <option value="male-south-african">Male - South African</option>
                                 <option value="female-south-african">Female - South African</option>
@@ -344,13 +362,28 @@
                     </div>
 
                     <div id="captionOptions" style="margin-top: 10px;">
-                        <label for="captionStyle">Caption Style</label>
-                        <select id="captionStyle" name="captionStyle">
-                            <option value="modern">Modern</option>
-                            <option value="classic">Classic</option>
-                            <option value="minimal">Minimal</option>
-                            <option value="bold">Bold</option>
+                        <label for="captionStyle">Caption Style (10 Options)</label>
+                        <select id="captionStyle" name="captionStyle" style="font-size: 15px;">
+                            <optgroup label="📝 Standard Styles">
+                                <option value="modern">Modern - White with Black Outline</option>
+                                <option value="bold">Bold - Large White with Strong Outline</option>
+                                <option value="classic">Classic - Yellow Subtitles</option>
+                                <option value="minimal">Minimal - Clean White, No Outline</option>
+                            </optgroup>
+                            <optgroup label="✨ Text Transforms">
+                                <option value="uppercase">UPPERCASE - ALL CAPS BOLD ⭐</option>
+                                <option value="lowercase">lowercase - all lowercase</option>
+                                <option value="elegant">Elegant - Title Case</option>
+                            </optgroup>
+                            <optgroup label="🎨 Special Effects">
+                                <option value="neon">Neon - Cyan & Magenta Pop</option>
+                                <option value="shadow">Shadow - Deep Shadow Effect</option>
+                                <option value="outline">Outline - Black on White</option>
+                            </optgroup>
                         </select>
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                            💡 UPPERCASE is great for shorts and TikTok!
+                        </p>
                     </div>
                 </div>
 
@@ -410,6 +443,36 @@
             }
         });
 
+        // Voice preview functionality
+        document.getElementById('previewVoiceBtn').addEventListener('click', async function() {
+            const voice = document.getElementById('voice').value;
+            const btn = this;
+            const originalText = btn.textContent;
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = '🔄 Loading...';
+                
+                const audio = new Audio(`/api/preview-voice/${voice}`);
+                audio.play();
+                
+                audio.onended = function() {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                };
+                
+                audio.onerror = function() {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                    alert('Preview failed. Please try again.');
+                };
+            } catch (error) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                console.error('Preview error:', error);
+            }
+        });
+
         // Form submission
         document.getElementById('videoForm').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -422,6 +485,7 @@
             formData.append('caption_style', document.getElementById('captionStyle').value);
             formData.append('add_music', document.getElementById('addMusic').checked);
             formData.append('mood', document.getElementById('mood').value);
+            formData.append('aspect_ratio', document.getElementById('aspectRatio').value);
 
             const voiceFile = document.getElementById('voiceFile').files[0];
             if (voiceFile) {

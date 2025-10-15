@@ -112,13 +112,13 @@ Respond in this EXACT JSON format:
                 # Parse response
                 import json
                 content = data['choices'][0]['message']['content']
-                
+
                 # Extract JSON from response
                 if "```json" in content:
                     content = content.split("```json")[1].split("```")[0]
                 elif "```" in content:
                     content = content.split("```")[1].split("```")[0]
-                
+
                 result = json.loads(content.strip())
 
                 return {
@@ -176,23 +176,22 @@ Respond in this EXACT JSON format:
             List of (media_path, verification_result) tuples
         """
         results = []
-        
+
         for media_file, scene in zip(media_files, scenes):
             visual_desc = scene.get('visual_description', '')
             visual_keywords = scene.get('visual_keywords', [])
-            
+
             verification = await self.verify_media_matches_scene(
                 media_file,
                 visual_desc,
                 visual_keywords
             )
-            
+
             results.append((media_file, verification))
-            
+
             # Log verification result
             status = "✅" if verification["matches"] else "❌"
             score = verification["confidence_score"]
             print(f"{status} {media_file.name}: {score}/100 - {verification['explanation'][:60]}...")
-        
-        return results
 
+        return results

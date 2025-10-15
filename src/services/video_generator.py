@@ -23,17 +23,29 @@ class VideoGenerator:
     def __init__(
         self,
         output_dir: Path = Path("./output"),
-        temp_dir: Path = Path("./data/temp")
+        temp_dir: Path = Path("./data/temp"),
+        aspect_ratio: str = "16:9"
     ):
-        """Initialize video generator."""
+        """Initialize video generator with configurable aspect ratio."""
         self.output_dir = output_dir
         self.temp_dir = temp_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.temp_dir.mkdir(parents=True, exist_ok=True)
 
-        # Video settings
-        self.resolution = (1920, 1080)
+        # Video settings - SUPPORT MULTIPLE ASPECT RATIOS
+        self.aspect_ratio = aspect_ratio
+        self.resolution = self._get_resolution(aspect_ratio)
         self.fps = 30
+    
+    def _get_resolution(self, aspect_ratio: str) -> tuple:
+        """Get resolution for different aspect ratios."""
+        resolutions = {
+            "16:9": (1920, 1080),      # YouTube, Desktop
+            "9:16": (1080, 1920),      # YouTube Shorts, TikTok, Instagram Reels
+            "1:1": (1080, 1080),       # Instagram Square
+            "4:5": (1080, 1350),       # Instagram Portrait
+        }
+        return resolutions.get(aspect_ratio, (1920, 1080))
 
     async def generate_video(
         self,

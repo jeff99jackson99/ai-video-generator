@@ -102,7 +102,7 @@ class VoiceoverManager:
                 "male-narrator": "en-US-BrandonNeural",  # Professional narrator
                 "male-confident": "en-US-AndrewNeural",  # Confident, strong
                 "male-friendly": "en-US-ChristopherNeural",  # Warm, friendly
-                
+
                 # === FEMALE VOICES - AMERICAN ===
                 "female": "en-US-AriaNeural",  # Clear, professional
                 "female-warm": "en-US-JennyNeural",  # Warm, friendly
@@ -110,40 +110,40 @@ class VoiceoverManager:
                 "female-cheerful": "en-US-MichelleNeural",  # Upbeat, cheerful
                 "female-calm": "en-US-AshleyNeural",  # Calm, soothing
                 "female-confident": "en-US-MonicaNeural",  # Strong, confident
-                
+
                 # === BRITISH VOICES ===
                 "male-british": "en-GB-RyanNeural",  # British professional male
                 "male-british-calm": "en-GB-ThomasNeural",  # Calm British male
                 "female-british": "en-GB-SoniaNeural",  # Elegant British female
                 "female-british-warm": "en-GB-LibbyNeural",  # Warm British female
-                
+
                 # === AUSTRALIAN VOICES ===
                 "male-australian": "en-AU-WilliamNeural",  # Australian male
                 "female-australian": "en-AU-NatashaNeural",  # Australian female
                 "female-australian-calm": "en-AU-AnnetteNeural",  # Calm Australian female
-                
+
                 # === CANADIAN VOICES ===
                 "male-canadian": "en-CA-LiamNeural",  # Canadian male
                 "female-canadian": "en-CA-ClaraNeural",  # Canadian female
-                
+
                 # === IRISH VOICES ===
                 "male-irish": "en-IE-ConnorNeural",  # Irish male
                 "female-irish": "en-IE-EmilyNeural",  # Irish female
-                
+
                 # === INDIAN VOICES ===
                 "male-indian": "en-IN-PrabhatNeural",  # Indian male
                 "female-indian": "en-IN-NeerjaNeural",  # Indian female
-                
+
                 # === SOUTH AFRICAN VOICES ===
                 "male-south-african": "en-ZA-LukeNeural",  # South African male
                 "female-south-african": "en-ZA-LeahNeural",  # South African female
-                
+
                 # === SPECIAL / EMOTIONAL STYLES ===
                 "narrator-male": "en-US-BrandonNeural",  # Best male narrator
                 "narrator-female": "en-US-SaraNeural",  # Best female narrator
                 "storyteller-male": "en-US-GuyNeural",  # Great for stories
                 "storyteller-female": "en-US-JennyNeural",  # Engaging storyteller
-                
+
                 # === DEFAULT ===
                 "default": "en-US-GuyNeural"
             }

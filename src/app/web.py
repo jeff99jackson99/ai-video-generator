@@ -84,6 +84,7 @@ class GenerateRequest(BaseModel):
     caption_style: str = "modern"
     add_music: bool = True
     mood: Optional[str] = "professional"
+    aspect_ratio: str = "16:9"  # Support multiple aspect ratios
 
 
 class SettingsRequest(BaseModel):
@@ -120,6 +121,7 @@ async def generate_video(
     caption_style: str = Form("modern"),
     add_music: bool = Form(True),
     mood: Optional[str] = Form("professional"),
+    aspect_ratio: str = Form("16:9"),
     voice_recording: Optional[UploadFile] = File(None),
     background_tasks: BackgroundTasks = None
 ):
@@ -144,7 +146,8 @@ async def generate_video(
             "add_captions": add_captions,
             "caption_style": caption_style,
             "add_music": add_music,
-            "mood": mood
+            "mood": mood,
+            "aspect_ratio": aspect_ratio
         }
 
         job_id = job_manager.create_job(script, options)
@@ -314,6 +317,29 @@ async def list_jobs(limit: int = 20):
     }
 
 
+@app.get("/api/preview-voice/{voice_name}")
+async def preview_voice(voice_name: str):
+    """Generate a short preview of a voice."""
+    try:
+        preview_text = "Hello! This is a preview of this voice. Perfect for your video."
+        
+        # Generate preview audio
+        preview_id = f"preview_{voice_name}"
+        preview_audio = await voiceover_manager.generate_tts(
+            preview_text,
+            preview_id,
+            voice=voice_name
+        )
+        
+        return FileResponse(
+            preview_audio,
+            media_type="audio/mpeg",
+            filename=f"preview_{voice_name}.mp3"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Preview generation failed: {str(e)}")
+
+
 # Background task for video processing
 async def process_video_job(job_id: str):
     """Process a video generation job in the background."""
@@ -359,18 +385,18 @@ async def process_video_job(job_id: str):
         if Config.OPENAI_API_KEY:
             job_manager.update_job(job_id, progress=29)
             print(f"🔍 Verifying media quality with GPT-4 Vision...")
-            
+
             verified_media = []
             for i, (media_file, scene) in enumerate(zip(media_files, scenes)):
                 visual_desc = scene.get('visual_description', '')
                 visual_keywords = scene.get('visual_keywords', [])
-                
+
                 verification = await media_verifier.verify_media_matches_scene(
                     media_file,
                     visual_desc,
                     visual_keywords
                 )
-                
+
                 # Accept media if score >= 60
                 if verification['matches']:
                     verified_media.append(media_file)
@@ -379,11 +405,11 @@ async def process_video_job(job_id: str):
                     # Keep it anyway but log warning (don't block video generation)
                     verified_media.append(media_file)
                     print(f"  ⚠️ Scene {i+1}: {verification['confidence_score']}/100 - Using anyway")
-                
+
                 # Update progress for each verification
                 progress = 29 + int((i / len(media_files)) * 2)
                 job_manager.update_job(job_id, progress=progress)
-            
+
             media_files = verified_media
             job_manager.update_job(job_id, progress=31)
             print(f"✅ All media verified!")
@@ -450,15 +476,15 @@ async def process_video_job(job_id: str):
         captions = None
         if options.get('add_captions', True):
             job_manager.update_job(job_id, progress=58)
-            
+
             # Use Whisper to transcribe the actual audio for perfect timing
             captions = await caption_generator.generate_captions_from_audio(
                 voiceover_path,
                 use_whisper=True
             )
-            
+
             job_manager.update_job(job_id, progress=62)
-            
+
             if captions:
                 # Apply styling to the accurately-timed captions
                 captions = caption_generator.prepare_captions_for_video(
@@ -500,16 +526,24 @@ async def process_video_job(job_id: str):
                 print(f"✅ Background music ready!")
             job_manager.update_job(job_id, progress=72)
 
-        # Step 6: Generate video with detailed progress
+        # Step 6: Generate video with detailed progress and aspect ratio
         job_manager.update_job(job_id, progress=75)
-        print(f"🎬 Starting video assembly...")
+        aspect_ratio = options.get('aspect_ratio', '16:9')
+        print(f"🎬 Starting video assembly ({aspect_ratio})...")
+        
+        # Create video generator with specified aspect ratio
+        video_gen = VideoGenerator(
+            output_dir=Config.OUTPUT_DIR,
+            temp_dir=Config.DATA_DIR / "temp",
+            aspect_ratio=aspect_ratio
+        )
 
         def update_progress(progress: int):
             """Real-time progress callback."""
             job_manager.update_job(job_id, progress=progress)
             print(f"📊 Progress: {progress}%")
 
-        output_path = await video_generator.generate_video(
+        output_path = await video_gen.generate_video(
             job_id=job_id,
             scenes=scenes,
             media_files=media_files,
