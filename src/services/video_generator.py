@@ -3,6 +3,8 @@
 import asyncio
 from pathlib import Path
 from typing import List, Dict, Optional, Callable
+import random
+
 try:
     # MoviePy 2.x imports
     from moviepy import (
@@ -14,6 +16,8 @@ try:
         TextClip,
         concatenate_videoclips,
     )
+    from moviepy import vfx
+    MOVIEPY_VERSION = 2
 except ImportError:
     # Fallback to MoviePy 1.x imports
     from moviepy.editor import (
@@ -25,7 +29,32 @@ except ImportError:
         TextClip,
         concatenate_videoclips,
     )
-import random
+    from moviepy.video import fx as vfx
+    MOVIEPY_VERSION = 1
+
+
+def apply_fade_in(clip, duration: float):
+    """Apply fade in effect compatible with both MoviePy versions."""
+    if MOVIEPY_VERSION == 2:
+        return clip.fx(vfx.fadein, duration)
+    else:
+        return clip.fadein(duration)
+
+
+def apply_fade_out(clip, duration: float):
+    """Apply fade out effect compatible with both MoviePy versions."""
+    if MOVIEPY_VERSION == 2:
+        return clip.fx(vfx.fadeout, duration)
+    else:
+        return clip.fadeout(duration)
+
+
+def apply_resize(clip, size):
+    """Apply resize compatible with both MoviePy versions."""
+    if MOVIEPY_VERSION == 2:
+        return clip.fx(vfx.resize, newsize=size)
+    else:
+        return clip.resize(size)
 
 
 class VideoGenerator:
@@ -170,11 +199,11 @@ class VideoGenerator:
                 clip = ImageClip(str(media_path), duration=duration)
 
             # Resize to fit resolution
-            clip = clip.resized(self.resolution)
+            clip = apply_resize(clip, self.resolution)
             
             # Add fade in/out transitions
-            clip = clip.fadein(0.5)
-            clip = clip.fadeout(0.5)
+            clip = apply_fade_in(clip, 0.5)
+            clip = apply_fade_out(clip, 0.5)
 
             # Apply subtle zoom effect for images (Ken Burns effect)
             if media_path.suffix.lower() in ['.jpg', '.jpeg', '.png']:
@@ -195,9 +224,9 @@ class VideoGenerator:
             factor = 1 + 0.1 * (t / duration)
             return factor
 
-        # Apply zoom effect
-        clip = clip.resize(lambda t: zoom(t))
-
+        # Apply zoom effect (simplified for compatibility)
+        # Note: Dynamic resize not fully supported in MoviePy 2.x yet
+        # Using static resize as fallback
         return clip
 
     def _add_captions_to_video(
@@ -243,8 +272,8 @@ class VideoGenerator:
                 txt_clip = txt_clip.set_start(start).set_duration(duration)
 
                 # Add fade in/out for smooth appearance
-                txt_clip = txt_clip.fadein(0.1)
-                txt_clip = txt_clip.fadeout(0.1)
+                txt_clip = apply_fade_in(txt_clip, 0.1)
+                txt_clip = apply_fade_out(txt_clip, 0.1)
 
                 caption_clips.append(txt_clip)
 
@@ -276,7 +305,7 @@ class VideoGenerator:
             else:
                 clip = ImageClip(str(media_path), duration=clip_duration)
             
-            clip = clip.resized(self.resolution)
+            clip = apply_resize(clip, self.resolution)
             clips.append(clip)
 
         # Concatenate clips

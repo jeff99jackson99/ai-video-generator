@@ -46,4 +46,3 @@ echo ""
 
 # Start the server
 /opt/homebrew/bin/python3.11 -m uvicorn src.app.web:app --host 0.0.0.0 --port 8000 --reload
-
