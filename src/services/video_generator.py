@@ -120,7 +120,7 @@ class VideoGenerator:
 
             print(f"🎬 Exporting EXTREME QUALITY video ({total_frames} frames)...")
             print(f"🚀 Using M4 Mac's full processing power...")
-            
+
             # EXTREME QUALITY export settings for M4 Mac
             final_video.write_videofile(
                 str(output_path),
@@ -145,7 +145,7 @@ class VideoGenerator:
                     '-color_trc', 'bt709'
                 ]
             )
-            
+
             print(f"✅ EXTREME QUALITY export complete!")
 
             if progress_callback:

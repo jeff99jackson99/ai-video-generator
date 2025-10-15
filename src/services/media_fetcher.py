@@ -25,6 +25,129 @@ class MediaFetcher:
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
+    async def search_and_download_per_scene(
+        self,
+        scenes: List[Dict],
+        media_type: str = "mixed"
+    ) -> List[Path]:
+        """
+        Fetch unique media for each scene using scene-specific visual descriptions.
+        
+        This ensures NO repetitive images - each scene gets its own unique media.
+        
+        Args:
+            scenes: List of scene dictionaries with visual_description and visual_keywords
+            media_type: "photos", "videos", or "mixed"
+        
+        Returns:
+            List of media file paths (one per scene)
+        """
+        all_media = []
+        
+        print(f"🎬 Fetching unique media for {len(scenes)} scenes...")
+        
+        for i, scene in enumerate(scenes):
+            # Extract scene-specific keywords
+            visual_keywords = scene.get('visual_keywords', [])
+            visual_desc = scene.get('visual_description', '')
+            
+            # Fallback to extracting keywords from visual description
+            if not visual_keywords and visual_desc:
+                visual_keywords = self._extract_visual_keywords(visual_desc)
+            
+            # Fetch media for this specific scene
+            scene_media = await self._fetch_scene_media(
+                visual_keywords,
+                media_type,
+                scene_index=i
+            )
+            
+            if scene_media:
+                all_media.append(scene_media)
+                print(f"  ✅ Scene {i+1}/{len(scenes)}: {scene_media.name}")
+            else:
+                print(f"  ⚠️ Scene {i+1}/{len(scenes)}: No media found, using fallback")
+                # Fallback: create placeholder
+                fallback = await self._create_artistic_placeholders(
+                    visual_keywords[:1] if visual_keywords else ["placeholder"],
+                    1
+                )
+                if fallback:
+                    all_media.append(fallback[0])
+        
+        print(f"✅ Fetched {len(all_media)} unique media files (one per scene)")
+        return all_media
+
+    async def _fetch_scene_media(
+        self,
+        keywords: List[str],
+        media_type: str,
+        scene_index: int
+    ) -> Optional[Path]:
+        """Fetch a single media file for a specific scene."""
+        if not keywords:
+            return None
+        
+        try:
+            if self.pexels_key:
+                # Use Pexels with scene-specific keywords
+                query = " ".join(keywords[:3])  # Use top 3 keywords
+                
+                # Alternate between photos and videos for dynamic content
+                if media_type == "mixed":
+                    fetch_type = "photos" if scene_index % 2 == 0 else "videos"
+                else:
+                    fetch_type = media_type
+                
+                media_urls = await self._search_pexels([query], count=1, media_type=fetch_type)
+                
+                if media_urls:
+                    # Download the media file
+                    media_path = await self._download_file(media_urls[0])
+                    return media_path
+            
+            # Fallback to Unsplash Source if no Pexels key
+            if media_type in ["photos", "mixed"] and keywords:
+                keyword = keywords[0].lower().replace(' ', ',')
+                url = f"https://source.unsplash.com/1920x1080/?{keyword}"
+                media_path = await self._download_file_with_fallback(url, keyword, scene_index)
+                return media_path
+                
+        except Exception as e:
+            print(f"Error fetching media for scene {scene_index}: {e}")
+        
+        return None
+
+    def _extract_visual_keywords(self, visual_description: str) -> List[str]:
+        """Extract searchable keywords from visual description."""
+        import re
+        
+        # Remove common words and extract nouns/adjectives
+        stop_words = {
+            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+            'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+            'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should',
+            'could', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those'
+        }
+        
+        # Extract words (3+ characters)
+        words = re.findall(r'\b[a-z]{3,}\b', visual_description.lower())
+        
+        # Filter stop words and get unique keywords
+        keywords = [w for w in words if w not in stop_words]
+        
+        # Return top 5 unique keywords
+        seen = set()
+        unique_keywords = []
+        for k in keywords:
+            if k not in seen:
+                seen.add(k)
+                unique_keywords.append(k)
+                if len(unique_keywords) >= 5:
+                    break
+        
+        return unique_keywords
+
     async def search_and_download(
         self,
         keywords: List[str],

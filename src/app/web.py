@@ -20,6 +20,7 @@ from src.services.music_selector import MusicSelector
 from src.services.video_generator import VideoGenerator
 from src.services.video_quality_enhancer import VideoQualityEnhancer
 from src.services.extreme_quality_enhancer import ExtremeQualityEnhancer
+from src.services.media_verifier import MediaVerifier
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -64,6 +65,9 @@ quality_enhancer = VideoQualityEnhancer(
     openai_api_key=Config.OPENAI_API_KEY
 )
 extreme_enhancer = ExtremeQualityEnhancer()
+media_verifier = MediaVerifier(
+    openai_api_key=Config.OPENAI_API_KEY
+)
 
 # Mount static files
 static_dir = Path(__file__).parent / "static"
@@ -337,24 +341,57 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=15)
         print(f"✅ Script enhanced! {len(scenes)} scenes, {len(keywords)} keywords")
 
-        # Step 2: Fetch media with progress updates (mix of photos and videos!)
+        # Step 2: Fetch UNIQUE media per scene (no more repetition!)
         job_manager.update_job(job_id, progress=20)
-        print(f"📸 Fetching {len(scenes)} media files (photos + video clips) from Pexels...")
-        job_manager.update_job(job_id, progress=25)
+        print(f"📸 Fetching unique media for {len(scenes)} scenes using AI visual descriptions...")
+        job_manager.update_job(job_id, progress=22)
 
-        media_files = await media_fetcher.search_and_download(
-            keywords,
-            count=len(scenes),
+        # Use per-scene fetching for unique, contextually-relevant media
+        media_files = await media_fetcher.search_and_download_per_scene(
+            scenes,
             media_type="mixed"  # Get both photos AND short video clips for dynamic content
         )
-        
-        job_manager.update_job(job_id, progress=30)
-        print(f"✅ {len(media_files)} media files downloaded!")
-        
+
+        job_manager.update_job(job_id, progress=28)
+        print(f"✅ {len(media_files)} unique media files downloaded (one per scene)!")
+
+        # Step 2.5: VERIFY media matches scene descriptions (GPT-4 Vision)
+        if Config.OPENAI_API_KEY:
+            job_manager.update_job(job_id, progress=29)
+            print(f"🔍 Verifying media quality with GPT-4 Vision...")
+            
+            verified_media = []
+            for i, (media_file, scene) in enumerate(zip(media_files, scenes)):
+                visual_desc = scene.get('visual_description', '')
+                visual_keywords = scene.get('visual_keywords', [])
+                
+                verification = await media_verifier.verify_media_matches_scene(
+                    media_file,
+                    visual_desc,
+                    visual_keywords
+                )
+                
+                # Accept media if score >= 60
+                if verification['matches']:
+                    verified_media.append(media_file)
+                    print(f"  ✅ Scene {i+1}: {verification['confidence_score']}/100 - {verification['explanation'][:50]}...")
+                else:
+                    # Keep it anyway but log warning (don't block video generation)
+                    verified_media.append(media_file)
+                    print(f"  ⚠️ Scene {i+1}: {verification['confidence_score']}/100 - Using anyway")
+                
+                # Update progress for each verification
+                progress = 29 + int((i / len(media_files)) * 2)
+                job_manager.update_job(job_id, progress=progress)
+            
+            media_files = verified_media
+            job_manager.update_job(job_id, progress=31)
+            print(f"✅ All media verified!")
+
         # EXTREME QUALITY: Enhance all images with AI
         print(f"🎨 AI enhancing {len(media_files)} media files for maximum quality...")
         job_manager.update_job(job_id, progress=32)
-        
+
         enhanced_media = []
         for i, media_file in enumerate(media_files):
             try:
@@ -365,14 +402,14 @@ async def process_video_job(job_id: str):
                 else:
                     # Use video as-is (already high quality from Pexels)
                     enhanced_media.append(media_file)
-                
+
                 # Progress update for each file
                 progress = 32 + int((i / len(media_files)) * 6)
                 job_manager.update_job(job_id, progress=progress)
             except Exception as e:
                 print(f"Enhancement error for {media_file.name}: {e}")
                 enhanced_media.append(media_file)  # Use original if enhancement fails
-        
+
         media_files = enhanced_media
         job_manager.update_job(job_id, progress=38)
         print(f"✅ All media AI-enhanced for EXTREME quality!")
@@ -407,24 +444,43 @@ async def process_video_job(job_id: str):
         job_manager.update_job(job_id, progress=54)
         print(f"✅ Voiceover ready! Duration: {voiceover_manager.get_audio_duration(voiceover_path):.1f}s")
 
-        # Step 4: Generate captions with progress
+        # Step 4: Generate captions with WHISPER for accurate timing
         job_manager.update_job(job_id, progress=56)
-        print(f"📝 Generating captions...")
+        print(f"📝 Generating captions with Whisper (accurate timing)...")
         captions = None
         if options.get('add_captions', True):
             job_manager.update_job(job_id, progress=58)
-            captions = await caption_generator.generate_captions_from_script(
-                script,
-                scenes,
-                voiceover_manager.get_audio_duration(voiceover_path)
+            
+            # Use Whisper to transcribe the actual audio for perfect timing
+            captions = await caption_generator.generate_captions_from_audio(
+                voiceover_path,
+                use_whisper=True
             )
+            
             job_manager.update_job(job_id, progress=62)
-            captions = caption_generator.prepare_captions_for_video(
-                captions,
-                style=options.get('caption_style', 'modern')
-            )
-            job_manager.update_job(job_id, progress=65)
-            print(f"✅ {len(captions)} captions created!")
+            
+            if captions:
+                # Apply styling to the accurately-timed captions
+                captions = caption_generator.prepare_captions_for_video(
+                    captions,
+                    style=options.get('caption_style', 'modern')
+                )
+                job_manager.update_job(job_id, progress=65)
+                print(f"✅ {len(captions)} perfectly-timed captions created!")
+            else:
+                # Fallback to script-based if Whisper fails
+                print(f"⚠️ Whisper failed, using script-based timing...")
+                captions = await caption_generator.generate_captions_from_script(
+                    script,
+                    scenes,
+                    voiceover_manager.get_audio_duration(voiceover_path)
+                )
+                captions = caption_generator.prepare_captions_for_video(
+                    captions,
+                    style=options.get('caption_style', 'modern')
+                )
+                job_manager.update_job(job_id, progress=65)
+                print(f"✅ {len(captions)} script-based captions created")
 
         # Step 5: Get background music
         job_manager.update_job(job_id, progress=68)

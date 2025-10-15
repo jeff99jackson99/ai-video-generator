@@ -80,7 +80,7 @@ class ScriptEnhancer:
                         },
                         {
                             "role": "user",
-                            "content": f"""Analyze and enhance this video script:
+                            "content": f"""Analyze and enhance this video script for a high-quality video production:
 
 {script}
 
@@ -90,16 +90,26 @@ Provide a comprehensive analysis in this EXACT JSON format:
     "scenes": [
         {{
             "text": "Scene narration text",
-            "visual_description": "Detailed description of what visuals to show",
-            "duration": 5
+            "visual_description": "HIGHLY DETAILED visual description with 3-5 specific visual elements (lighting, subjects, composition, colors, mood)",
+            "visual_keywords": ["specific", "searchable", "keywords"],
+            "duration": 6
         }}
     ],
-    "keywords": ["keyword1", "keyword2", "keyword3"],
+    "keywords": ["broad", "theme", "keywords"],
     "mood": "inspirational/professional/upbeat/calm/dramatic/educational",
     "duration_estimate": 90
 }}
 
-Make the enhanced script more impactful and visual. Break it into well-paced scenes. Extract specific visual keywords that would make great imagery."""
+CRITICAL REQUIREMENTS:
+1. Each scene MUST have a UNIQUE, DETAILED visual_description with specific elements:
+   - Example: "Close-up of weathered hands clasped in prayer, warm golden sunset light streaming through window, peaceful expression, soft bokeh background, serene atmosphere"
+   - NOT just: "person praying"
+2. Each scene MUST have 3-5 visual_keywords optimized for stock photo/video search
+3. Make scenes 6-12 seconds each for better pacing
+4. Ensure visual descriptions are DIVERSE - no repetitive imagery
+5. Include specific details: lighting, colors, composition, subjects, emotions, atmosphere
+
+Make the enhanced script more impactful and visual. Break it into well-paced scenes with UNIQUE visual guidance for each scene."""
                         }
                     ],
                     "temperature": 0.7,
@@ -227,7 +237,7 @@ Return ONLY valid JSON in this format:
             # Calculate duration based on text length (reading pace: ~3 words/second)
             word_count = len(scene_text.split())
             duration = max(6, min(12, word_count / 2.5))  # 6-12 seconds per scene
-            
+
             scenes.append({
                 "text": scene_text,
                 "visual_description": f"Visual for: {scene_text[:50]}...",

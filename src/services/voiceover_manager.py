@@ -32,7 +32,10 @@ class VoiceoverManager:
         text: str,
         job_id: str,
         voice: str = "default",
-        use_gtts: bool = True
+        use_gtts: bool = True,
+        rate: str = "+0%",
+        pitch: str = "+0Hz",
+        volume: str = "+0%"
     ) -> Path:
         """Generate text-to-speech with natural-sounding voices."""
         filename = f"{job_id}_tts.mp3"
@@ -41,7 +44,7 @@ class VoiceoverManager:
         # Try Edge TTS first - FREE Microsoft voices, very natural!
         try:
             print(f"🎙️ Generating voiceover with Edge TTS (Microsoft) - Natural {voice} voice...")
-            return await self._generate_edge_tts(text, file_path, voice)
+            return await self._generate_edge_tts(text, file_path, voice, rate, pitch, volume)
         except Exception as e:
             print(f"Edge TTS error: {e}, trying Coqui TTS")
 
@@ -76,43 +79,88 @@ class VoiceoverManager:
         self,
         text: str,
         output_path: Path,
-        voice: str
+        voice: str,
+        rate: str = "+0%",
+        pitch: str = "+0Hz",
+        volume: str = "+0%"
     ) -> Path:
         """
         Generate TTS using Microsoft Edge TTS (FREE, very natural voices).
 
         Edge TTS voices are 100% free and sound like real people!
+        Now with 30+ voices and speech controls!
         """
         try:
             import edge_tts
 
-            # Professional voice selection - Microsoft Edge TTS (sounds like real people!)
+            # EXPANDED Professional voice selection - Microsoft Edge TTS (30+ voices!)
             voice_map = {
-                # Male voices (professional, natural)
-                "male": "en-US-GuyNeural",  # Deep, authoritative American male
-                "male-young": "en-US-EricNeural",  # Young, energetic male
-                "male-british": "en-GB-RyanNeural",  # British accent, professional
-                "male-calm": "en-US-DavisNeural",  # Calm, soothing male
+                # === MALE VOICES - AMERICAN ===
+                "male": "en-US-GuyNeural",  # Deep, authoritative
+                "male-young": "en-US-EricNeural",  # Young, energetic
+                "male-calm": "en-US-DavisNeural",  # Calm, soothing
                 "male-narrator": "en-US-BrandonNeural",  # Professional narrator
-
-                # Female voices (warm, clear)
-                "female": "en-US-AriaNeural",  # Clear, professional female
-                "female-warm": "en-US-JennyNeural",  # Warm, friendly female
-                "female-british": "en-GB-SoniaNeural",  # British accent, elegant
+                "male-confident": "en-US-AndrewNeural",  # Confident, strong
+                "male-friendly": "en-US-ChristopherNeural",  # Warm, friendly
+                
+                # === FEMALE VOICES - AMERICAN ===
+                "female": "en-US-AriaNeural",  # Clear, professional
+                "female-warm": "en-US-JennyNeural",  # Warm, friendly
                 "female-narrator": "en-US-SaraNeural",  # Professional narrator
-
-                # Special voices
-                "default": "en-US-GuyNeural",  # Default to male
-                "narrator-male": "en-US-BrandonNeural",  # Best for narration
-                "narrator-female": "en-US-SaraNeural"  # Best for female narration
+                "female-cheerful": "en-US-MichelleNeural",  # Upbeat, cheerful
+                "female-calm": "en-US-AshleyNeural",  # Calm, soothing
+                "female-confident": "en-US-MonicaNeural",  # Strong, confident
+                
+                # === BRITISH VOICES ===
+                "male-british": "en-GB-RyanNeural",  # British professional male
+                "male-british-calm": "en-GB-ThomasNeural",  # Calm British male
+                "female-british": "en-GB-SoniaNeural",  # Elegant British female
+                "female-british-warm": "en-GB-LibbyNeural",  # Warm British female
+                
+                # === AUSTRALIAN VOICES ===
+                "male-australian": "en-AU-WilliamNeural",  # Australian male
+                "female-australian": "en-AU-NatashaNeural",  # Australian female
+                "female-australian-calm": "en-AU-AnnetteNeural",  # Calm Australian female
+                
+                # === CANADIAN VOICES ===
+                "male-canadian": "en-CA-LiamNeural",  # Canadian male
+                "female-canadian": "en-CA-ClaraNeural",  # Canadian female
+                
+                # === IRISH VOICES ===
+                "male-irish": "en-IE-ConnorNeural",  # Irish male
+                "female-irish": "en-IE-EmilyNeural",  # Irish female
+                
+                # === INDIAN VOICES ===
+                "male-indian": "en-IN-PrabhatNeural",  # Indian male
+                "female-indian": "en-IN-NeerjaNeural",  # Indian female
+                
+                # === SOUTH AFRICAN VOICES ===
+                "male-south-african": "en-ZA-LukeNeural",  # South African male
+                "female-south-african": "en-ZA-LeahNeural",  # South African female
+                
+                # === SPECIAL / EMOTIONAL STYLES ===
+                "narrator-male": "en-US-BrandonNeural",  # Best male narrator
+                "narrator-female": "en-US-SaraNeural",  # Best female narrator
+                "storyteller-male": "en-US-GuyNeural",  # Great for stories
+                "storyteller-female": "en-US-JennyNeural",  # Engaging storyteller
+                
+                # === DEFAULT ===
+                "default": "en-US-GuyNeural"
             }
 
-            edge_voice = voice_map.get(voice.lower(), voice_map["male"])
+            edge_voice = voice_map.get(voice.lower(), voice_map.get("male", "en-US-GuyNeural"))
 
-            print(f"🎙️ Using Microsoft Edge TTS voice: {edge_voice} (sounds like real person!)")
+            print(f"🎙️ Using Microsoft Edge TTS voice: {edge_voice}")
+            print(f"   Settings: Speed {rate}, Pitch {pitch}, Volume {volume}")
 
-            # Generate speech
-            communicate = edge_tts.Communicate(text, edge_voice)
+            # Generate speech with controls
+            communicate = edge_tts.Communicate(
+                text,
+                edge_voice,
+                rate=rate,      # Speed control: "-50%" to "+50%"
+                pitch=pitch,    # Pitch control: "-50Hz" to "+50Hz"
+                volume=volume   # Volume control: "-50%" to "+50%"
+            )
             await communicate.save(str(output_path))
 
             print(f"✅ Natural voiceover generated with Edge TTS!")

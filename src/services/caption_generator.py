@@ -19,18 +19,22 @@ class CaptionGenerator:
         use_whisper: bool = True
     ) -> List[Dict[str, any]]:
         """
-        Generate captions from audio file using Whisper.
+        Generate captions from audio file using Whisper with accurate timing.
 
         Returns list of caption segments with timestamps.
         """
-        if use_whisper:
-            try:
-                return await self._transcribe_with_whisper(audio_path)
-            except Exception as e:
-                print(f"Whisper transcription error: {e}")
-
-        # Fallback: return empty captions
-        return []
+        print(f"🎤 Transcribing audio with Whisper for accurate caption timing...")
+        
+        try:
+            # ALWAYS use Whisper for accurate timing
+            captions = await self._transcribe_with_whisper(audio_path)
+            print(f"✅ Generated {len(captions)} captions with precise timing!")
+            return captions
+        except Exception as e:
+            print(f"⚠️ Whisper transcription error: {e}")
+            print(f"   Falling back to empty captions")
+            # Fallback: return empty captions (better than wrong timing)
+            return []
 
     async def generate_captions_from_script(
         self,
@@ -92,33 +96,73 @@ class CaptionGenerator:
         self,
         audio_path: Path
     ) -> List[Dict[str, any]]:
-        """Transcribe audio using OpenAI Whisper."""
+        """
+        Transcribe audio using OpenAI Whisper with phrase-based grouping.
+        
+        Groups words into 2-4 word phrases for better readability.
+        """
         try:
             import whisper
+            import asyncio
 
-            # Load Whisper model (base is good balance of speed/accuracy)
-            model = whisper.load_model("base")
-
-            # Transcribe with word-level timestamps
-            result = model.transcribe(
-                str(audio_path),
-                word_timestamps=True,
-                language="en"
-            )
+            # Load Whisper model in thread pool (blocking operation)
+            loop = asyncio.get_event_loop()
+            
+            def load_and_transcribe():
+                print(f"   Loading Whisper base model...")
+                model = whisper.load_model("base")  # Fast, accurate
+                print(f"   Transcribing audio...")
+                return model.transcribe(
+                    str(audio_path),
+                    word_timestamps=True,
+                    language="en",
+                    fp16=False  # CPU compatibility
+                )
+            
+            # Run in thread pool to avoid blocking
+            result = await loop.run_in_executor(None, load_and_transcribe)
 
             captions = []
+            
+            # Group words into phrases for better readability
             for segment in result.get('segments', []):
-                # Get word-level timestamps if available
                 if 'words' in segment:
-                    for word_data in segment['words']:
-                        captions.append({
-                            'text': word_data['word'].strip(),
-                            'start_time': word_data['start'],
-                            'end_time': word_data['end'],
-                            'style': 'word'
-                        })
+                    words = segment['words']
+                    
+                    # Group words into phrases (2-4 words each)
+                    phrase_buffer = []
+                    phrase_start = None
+                    
+                    for i, word_data in enumerate(words):
+                        word = word_data['word'].strip()
+                        
+                        if not phrase_start:
+                            phrase_start = word_data['start']
+                        
+                        phrase_buffer.append(word)
+                        
+                        # Create phrase every 3 words or at punctuation
+                        is_punctuation = word.endswith(('.', ',', '!', '?', ';'))
+                        is_phrase_complete = len(phrase_buffer) >= 3 or is_punctuation
+                        is_last_word = i == len(words) - 1
+                        
+                        if is_phrase_complete or is_last_word:
+                            phrase_text = ' '.join(phrase_buffer)
+                            phrase_end = word_data['end']
+                            
+                            captions.append({
+                                'text': phrase_text,
+                                'start_time': phrase_start,
+                                'end_time': phrase_end,
+                                'style': 'phrase'
+                            })
+                            
+                            # Reset for next phrase
+                            phrase_buffer = []
+                            phrase_start = None
+                
                 else:
-                    # Fall back to segment-level
+                    # Fall back to segment-level (sentence-based)
                     captions.append({
                         'text': segment['text'].strip(),
                         'start_time': segment['start'],
@@ -126,6 +170,7 @@ class CaptionGenerator:
                         'style': 'sentence'
                     })
 
+            print(f"   Grouped into {len(captions)} readable phrase captions")
             return captions
 
         except Exception as e:
