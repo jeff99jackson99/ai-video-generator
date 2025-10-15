@@ -26,7 +26,6 @@ COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 COPY src/ /app/src/
-COPY .env.example /app/.env.example
 
 # Create data directories
 RUN mkdir -p /app/data/media /app/data/voiceovers /app/output
