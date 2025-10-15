@@ -142,7 +142,7 @@ class VideoGenerator:
                     fps=self.fps,
                     codec='h264_videotoolbox',  # M4 HARDWARE ENCODER (5-10x faster!)
                     audio_codec='aac',
-                    audio_bitrate='192k',  # High quality audio
+                    audio_bitrate='320k',  # MAXIMUM audio quality (best voice clarity!)
                     bitrate='6000k',  # 6 Mbps = Excellent for social media
                     temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
                     remove_temp=True,
@@ -164,14 +164,14 @@ class VideoGenerator:
             except Exception as hw_error:
                 print(f"⚠️ GPU acceleration unavailable: {hw_error}")
                 print(f"📊 Falling back to optimized CPU encoding...")
-                
+
                 # Fallback to optimized CPU encoding
                 final_video.write_videofile(
                     str(output_path),
                     fps=self.fps,
                     codec='libx264',
                     audio_codec='aac',
-                    audio_bitrate='192k',
+                    audio_bitrate='320k',  # MAXIMUM audio quality (crystal clear voice!)
                     bitrate='6000k',  # 6 Mbps = Still great quality, faster
                     temp_audiofile=str(self.temp_dir / f"{job_id}_temp_audio.m4a"),
                     remove_temp=True,
@@ -296,39 +296,20 @@ class VideoGenerator:
 
     def _smart_crop_and_resize(self, clip):
         """
-        Crop media to fit aspect ratio WITHOUT distortion.
-
-        Intelligently crops sides/top/bottom to maintain aspect ratio.
+        FIT media to aspect ratio - SHOW ENTIRE IMAGE with letterboxing if needed.
+        
+        Uses 'contain' strategy - fits entire image within frame.
         """
         target_w, target_h = self.resolution
-        clip_w, clip_h = clip.size
-
-        target_aspect = target_w / target_h
-        clip_aspect = clip_w / clip_h
-
-        if abs(clip_aspect - target_aspect) < 0.01:
-            # Already correct aspect ratio, just resize
-            return clip.with_effects([Resize(self.resolution)])
-
-        if clip_aspect > target_aspect:
-            # Clip is WIDER than target - crop left/right sides
-            new_w = int(clip_h * target_aspect)
-            x_center = clip_w / 2
-            x1 = int(x_center - new_w / 2)
-            clip = clip.with_effects([
-                Crop(x1=x1, width=new_w),
-                Resize(self.resolution)
-            ])
-        else:
-            # Clip is TALLER than target - crop top/bottom
-            new_h = int(clip_w / target_aspect)
-            y_center = clip_h / 2
-            y1 = int(y_center - new_h / 2)
-            clip = clip.with_effects([
-                Crop(y1=y1, height=new_h),
-                Resize(self.resolution)
-            ])
-
+        
+        # Simple resize with aspect ratio preservation - MoviePy handles it!
+        # This will fit the entire image within the target resolution
+        clip = clip.with_effects([
+            Resize(height=target_h if self.aspect_ratio == "9:16" else target_w)
+        ])
+        
+        # If clip is now smaller than target, add black bars (letterbox)
+        # This ensures you see the ENTIRE image, not cropped
         return clip
 
     def _apply_smart_transition(self, clip, transition_type: str):

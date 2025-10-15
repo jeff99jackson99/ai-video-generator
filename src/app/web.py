@@ -122,6 +122,24 @@ async def favicon():
     return {"status": "ok"}
 
 
+@app.get("/settings")
+async def settings_page():
+    """Serve the settings page."""
+    settings_file = static_dir / "settings.html"
+    if settings_file.exists():
+        return FileResponse(settings_file)
+    raise HTTPException(status_code=404, detail="Settings page not found")
+
+
+@app.get("/settings.html")
+async def settings_page_html():
+    """Serve the settings page (alternative route)."""
+    settings_file = static_dir / "settings.html"
+    if settings_file.exists():
+        return FileResponse(settings_file)
+    raise HTTPException(status_code=404, detail="Settings page not found")
+
+
 @app.get("/healthz")
 async def health_check():
     """Health check endpoint."""

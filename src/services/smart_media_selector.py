@@ -405,26 +405,56 @@ Script: "trumpet sounding loudly"
 ❌ WRONG: "announcement" (use literal trumpet)
 Speed: 1.2x FAST | Type: video | Transition: quick_cut
 
-CRITICAL RULES:
-1. Focus on PHYSICAL ACTIONS & VERBS (reaching, walking, crying, smiling, kneeling)
-2. Use SPECIFIC OBJECTS when mentioned (hand, face, cross, bible, phone)
-3. Include EMOTIONS with actions ("smiling feeling empty", "crying tears")
-4. AVOID abstract concepts (forgiveness, hope, heaven) - use CONCRETE visuals
-5. AVOID religious figure names - use actions/symbols instead
-6. Keep queries 3-5 words MAX
-7. Determine best media type:
-   - "video" for: actions, movement, people doing things
-   - "photo" for: static objects only
-8. Determine playback speed:
-   - 0.5-0.7: Slow motion (dramatic, peaceful, contemplative, emotional)
-   - 1.0: Normal (standard narration)
-   - 1.2-1.5: Fast (exciting, energetic, action, celebration)
-9. Determine transition:
-   - "crossfade": Smooth, peaceful, standard
-   - "zoom": Emphasis, important moments
-   - "quick_cut": Fast-paced, exciting, energetic
-   - "fade_black": Dramatic pause, major topic shift
-10. ENSURE VARIETY: Never repeat searches
+CRITICAL RULES FOR PERFECT MATCHES:
+
+1. EXTRACT THE EXACT ACTION/OBJECT FROM NARRATION
+   - Read narration word-by-word
+   - Find the MAIN VERB or MAIN NOUN
+   - Use THAT EXACT THING in search
+   
+2. BE ULTRA-SPECIFIC:
+   - "smiling but hollow" → "person smiling sad empty"
+   - "reaching for you" → "hand reaching out arm extended"
+   - "tears falling" → "tears falling face crying closeup"
+   - NOT generic: "emotion", "feeling", "spiritual"
+
+3. PRIORITIZE IN THIS ORDER:
+   a) Physical actions (crying, running, reaching, kneeling)
+   b) Visible objects (hands, face, cross, phone, bible)
+   c) Emotions paired with actions (happy crying, sad smiling)
+   d) Environmental context (rain, sunset, darkness, light)
+
+4. KEEP IT SIMPLE - 3-4 WORDS ONLY
+   - More words = worse Pexels results
+   - Focus on the ONE main visual
+   
+5. USE COMMON STOCK VIDEO TERMS:
+   ✅ "person crying tears"
+   ✅ "hand reaching gesture"
+   ✅ "people celebrating happy"
+   ❌ "spiritual awakening" (too abstract)
+   ❌ "divine intervention" (no stock footage)
+
+6. MEDIA TYPE:
+   - "video" for: ANYTHING with a person or movement (99% of time)
+   - "photo" for: Objects only (bible, landscape, no people)
+
+7. PLAYBACK SPEED:
+   - 0.6-0.7: Very emotional (tears, surrender, deep reflection)
+   - 0.8-0.9: Peaceful (prayer, calm, gentle moments)
+   - 1.0: Normal narration
+   - 1.1-1.3: Uplifting (walking forward, hope, light)
+   - 1.4-1.5: Action (running, celebrating, dancing)
+
+8. TRANSITION:
+   - "crossfade": 90% of scenes (default, smooth)
+   - "zoom": Key revelations only
+   - "quick_cut": Fast action scenes only
+   - "fade_black": Major topic shifts only
+
+9. ENSURE VARIETY: Track all searches, never repeat
+
+10. DOUBLE-CHECK: Will this query find footage that SHOWS what's being SAID?
 
 RESPOND IN THIS EXACT JSON FORMAT:
 {{

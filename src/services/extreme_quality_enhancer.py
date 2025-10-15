@@ -27,27 +27,38 @@ class ExtremeQualityEnhancer:
         if img.mode != 'RGB':
             img = img.convert('RGB')
 
-        # 1. Sharpen image for clarity
-        img = img.filter(ImageFilter.SHARPEN)
+        # UPSCALE if image is too small (better quality for 720p)
+        if img.width < 1280 or img.height < 1280:
+            scale_factor = max(1280 / img.width, 1280 / img.height, 1.0)
+            new_w = int(img.width * scale_factor)
+            new_h = int(img.height * scale_factor)
+            img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
 
-        # 2. Enhance colors
+        # 1. AGGRESSIVE sharpening for clarity
+        img = img.filter(ImageFilter.UnsharpMask(radius=3, percent=200, threshold=2))
+
+        # 2. Detail enhancement
+        img = img.filter(ImageFilter.DETAIL)
+
+        # 3. Enhance colors AGGRESSIVELY (vibrant!)
         color_enhancer = ImageEnhance.Color(img)
-        img = color_enhancer.enhance(1.2)  # Boost colors by 20%
+        img = color_enhancer.enhance(1.4)  # Boost colors by 40%!
 
-        # 3. Enhance contrast
+        # 4. Enhance contrast (punchy!)
         contrast_enhancer = ImageEnhance.Contrast(img)
-        img = contrast_enhancer.enhance(1.15)  # Boost contrast
+        img = contrast_enhancer.enhance(1.3)  # Boost contrast by 30%
 
-        # 4. Enhance brightness slightly
+        # 5. Enhance brightness
         brightness_enhancer = ImageEnhance.Brightness(img)
-        img = brightness_enhancer.enhance(1.05)
+        img = brightness_enhancer.enhance(1.1)  # +10% brightness
 
-        # 5. Final sharpness pass
-        img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+        # 6. Final sharpness pass (crisp!)
+        sharpness_enhancer = ImageEnhance.Sharpness(img)
+        img = sharpness_enhancer.enhance(1.5)  # +50% sharpness!
 
-        # Save enhanced version
+        # Save enhanced version with MAXIMUM quality
         enhanced_path = image_path.parent / f"{image_path.stem}_enhanced{image_path.suffix}"
-        img.save(enhanced_path, quality=95, optimize=True)
+        img.save(enhanced_path, quality=98, optimize=True)
 
         return enhanced_path
 
