@@ -103,36 +103,328 @@ VISUAL DESCRIPTION: "{visual_desc}"
 
 YOUR TASK: Generate a 3-5 word Pexels search query that will find footage showing EXACTLY what's happening in this moment.
 
+LEARN FROM THESE PROVEN EXAMPLES:
+
+EXAMPLE 1:
+Script: "smiling in photos, but inside, you feel hollow"
+✅ PERFECT: "person smiling feeling empty"
+❌ WRONG: "happiness" (too generic)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 2:
+Script: "scrolling, laugh, act like everything's fine"
+✅ PERFECT: "person scrolling laughing phone"
+❌ WRONG: "social media" (not specific enough)
+Speed: 1.0x | Type: video | Transition: quick_cut
+
+EXAMPLE 3:
+Script: "Something deep inside you knows"
+✅ PERFECT: "inner knowing person reflection"
+❌ WRONG: "thinking" (not emotional enough)
+Speed: 0.7x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 4:
+Script: "He never stopped reaching for you"
+✅ PERFECT: "hand reaching out gesture"
+❌ WRONG: "god reaching" (use physical action, not concept)
+Speed: 1.0x | Type: video | Transition: zoom
+
+EXAMPLE 5:
+Script: "He chose the cross for you"
+✅ PERFECT: "man bearing cross sacrifice"
+❌ WRONG: "crucifixion" (too graphic)
+Speed: 1.0x | Type: video | Transition: fade_black
+
+EXAMPLE 6:
+Script: "take the weight off your shoulders"
+✅ PERFECT: "person releasing burdens gesture"
+❌ WRONG: "relief" (use physical action)
+Speed: 0.7x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 7:
+Script: "calling your name"
+✅ PERFECT: "hands reaching out gesture"
+❌ WRONG: "prayer" (too generic)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 8:
+Script: "walking through the storm"
+✅ PERFECT: "person walking rain storm"
+❌ WRONG: "difficulty" (use literal imagery)
+Speed: 1.2x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 9:
+Script: "open Bible on the table"
+✅ PERFECT: "bible book open pages closeup"
+❌ WRONG: "scripture" (use specific object)
+Speed: 1.0x | Type: photo | Transition: crossfade
+
+EXAMPLE 10:
+Script: "sunrise breaking through darkness"
+✅ PERFECT: "sunrise dawn breaking clouds"
+❌ WRONG: "hope" (use literal visual)
+Speed: 0.8x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 11:
+Script: "running into His arms"
+✅ PERFECT: "person running open arms embrace"
+❌ WRONG: "reunion" (use action)
+Speed: 1.3x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 12:
+Script: "tears streaming down her face"
+✅ PERFECT: "woman crying tears closeup face"
+❌ WRONG: "sadness" (use specific visual)
+Speed: 0.6x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 13:
+Script: "kneeling in prayer"
+✅ PERFECT: "person kneeling praying hands"
+❌ WRONG: "worship" (use physical position)
+Speed: 0.8x SLOW | Type: video | Transition: fade_black
+
+EXAMPLE 14:
+Script: "celebrating with joyful dancing"
+✅ PERFECT: "people dancing celebration happy"
+❌ WRONG: "joy" (use action)
+Speed: 1.4x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 15:
+Script: "looking up to heaven"
+✅ PERFECT: "person looking up sky clouds"
+❌ WRONG: "heaven" (use physical action)
+Speed: 1.0x | Type: video | Transition: zoom
+
+EXAMPLE 16:
+Script: "broken chains falling to the ground"
+✅ PERFECT: "chains breaking falling freedom"
+❌ WRONG: "freedom" (use literal chains)
+Speed: 1.2x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 17:
+Script: "sitting alone in the dark"
+✅ PERFECT: "person sitting alone darkness room"
+❌ WRONG: "loneliness" (use physical scene)
+Speed: 0.7x SLOW | Type: video | Transition: fade_black
+
+EXAMPLE 18:
+Script: "children playing and laughing"
+✅ PERFECT: "children playing laughing happy joyful"
+❌ WRONG: "innocence" (use action)
+Speed: 1.3x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 19:
+Script: "holding hands together in unity"
+✅ PERFECT: "hands holding together unity closeup"
+❌ WRONG: "togetherness" (use physical touch)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 20:
+Script: "ocean waves crashing on shore"
+✅ PERFECT: "ocean waves crashing beach shore"
+❌ WRONG: "nature" (use specific imagery)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 21:
+Script: "heart beating with new life"
+✅ PERFECT: "heartbeat pulse life closeup"
+❌ WRONG: "life" (use specific visual)
+Speed: 1.1x FAST | Type: video | Transition: zoom
+
+EXAMPLE 22:
+Script: "whispering a quiet prayer"
+✅ PERFECT: "person whispering quiet prayer closeup"
+❌ WRONG: "meditation" (use specific action)
+Speed: 0.8x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 23:
+Script: "standing at the crossroads"
+✅ PERFECT: "person standing crossroads road path"
+❌ WRONG: "decision" (use literal crossroads)
+Speed: 1.0x | Type: video | Transition: fade_black
+
+EXAMPLE 24:
+Script: "mountains towering in the distance"
+✅ PERFECT: "mountains towering landscape distance"
+❌ WRONG: "strength" (use literal mountains)
+Speed: 0.9x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 25:
+Script: "fire burning brightly"
+✅ PERFECT: "fire flames burning bright closeup"
+❌ WRONG: "passion" (use literal fire)
+Speed: 1.2x FAST | Type: video | Transition: zoom
+
+EXAMPLE 26:
+Script: "embracing loved ones tightly"
+✅ PERFECT: "people embracing hugging tight love"
+❌ WRONG: "love" (use physical embrace)
+Speed: 0.8x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 27:
+Script: "walking confidently forward"
+✅ PERFECT: "person walking confident forward path"
+❌ WRONG: "confidence" (use action)
+Speed: 1.1x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 28:
+Script: "closing eyes in peace"
+✅ PERFECT: "person closing eyes peaceful calm"
+❌ WRONG: "peace" (use action)
+Speed: 0.7x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 29:
+Script: "hands lifted in worship"
+✅ PERFECT: "hands raised lifted worship gesture"
+❌ WRONG: "praise" (use physical gesture)
+Speed: 0.9x SLOW | Type: video | Transition: zoom
+
+EXAMPLE 30:
+Script: "breaking through the clouds"
+✅ PERFECT: "light breaking through clouds sky"
+❌ WRONG: "breakthrough" (use literal visual)
+Speed: 1.0x | Type: video | Transition: zoom
+
+EXAMPLE 31:
+Script: "carrying heavy burden uphill"
+✅ PERFECT: "person carrying weight uphill struggle"
+❌ WRONG: "burden" (use physical carrying)
+Speed: 0.9x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 32:
+Script: "door opening to light"
+✅ PERFECT: "door opening light shining through"
+❌ WRONG: "opportunity" (use literal door)
+Speed: 1.0x | Type: video | Transition: zoom
+
+EXAMPLE 33:
+Script: "flowers blooming in spring"
+✅ PERFECT: "flowers blooming spring garden closeup"
+❌ WRONG: "renewal" (use literal flowers)
+Speed: 0.8x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 34:
+Script: "running from darkness to light"
+✅ PERFECT: "person running darkness light"
+❌ WRONG: "transformation" (use action)
+Speed: 1.3x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 35:
+Script: "falling to knees in surrender"
+✅ PERFECT: "person falling knees surrender"
+❌ WRONG: "submission" (use action)
+Speed: 0.7x SLOW | Type: video | Transition: fade_black
+
+EXAMPLE 36:
+Script: "shouting with joy and victory"
+✅ PERFECT: "person shouting joy celebration victory"
+❌ WRONG: "triumph" (use action)
+Speed: 1.4x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 37:
+Script: "gentle rain falling softly"
+✅ PERFECT: "rain falling soft gentle drops"
+❌ WRONG: "blessing" (use literal rain)
+Speed: 0.8x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 38:
+Script: "throwing off old garments"
+✅ PERFECT: "person removing clothes throwing off"
+❌ WRONG: "change" (use physical action)
+Speed: 1.2x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 39:
+Script: "footsteps walking on path"
+✅ PERFECT: "feet walking path closeup steps"
+❌ WRONG: "journey" (use literal feet)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 40:
+Script: "candle flame flickering"
+✅ PERFECT: "candle flame flickering light closeup"
+❌ WRONG: "hope" (use literal candle)
+Speed: 0.9x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 41:
+Script: "jumping for joy"
+✅ PERFECT: "person jumping happy joy celebration"
+❌ WRONG: "happiness" (use jumping action)
+Speed: 1.3x FAST | Type: video | Transition: quick_cut
+
+EXAMPLE 42:
+Script: "blood dripping from wounds"
+✅ PERFECT: "water drops red sacrifice closeup"
+❌ WRONG: "sacrifice" (use tasteful alternative)
+Speed: 0.6x SLOW | Type: video | Transition: fade_black
+
+EXAMPLE 43:
+Script: "crown placed on head"
+✅ PERFECT: "crown placing head royalty gesture"
+❌ WRONG: "kingship" (use physical action)
+Speed: 0.8x SLOW | Type: video | Transition: zoom
+
+EXAMPLE 44:
+Script: "seeds planted in soil"
+✅ PERFECT: "seeds planting soil hands garden"
+❌ WRONG: "growth" (use literal planting)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 45:
+Script: "shadows fleeing from light"
+✅ PERFECT: "shadows disappearing light bright"
+❌ WRONG: "victory" (use literal shadow/light)
+Speed: 1.1x FAST | Type: video | Transition: zoom
+
+EXAMPLE 46:
+Script: "writing on scroll"
+✅ PERFECT: "hand writing scroll pen closeup"
+❌ WRONG: "scripture" (use writing action)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 47:
+Script: "stars shining in night sky"
+✅ PERFECT: "stars shining night sky galaxy"
+❌ WRONG: "guidance" (use literal stars)
+Speed: 0.9x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 48:
+Script: "breaking bread together"
+✅ PERFECT: "hands breaking bread sharing meal"
+❌ WRONG: "communion" (use physical action)
+Speed: 0.8x SLOW | Type: video | Transition: crossfade
+
+EXAMPLE 49:
+Script: "water flowing from rock"
+✅ PERFECT: "water flowing rock stream spring"
+❌ WRONG: "provision" (use literal water)
+Speed: 1.0x | Type: video | Transition: crossfade
+
+EXAMPLE 50:
+Script: "trumpet sounding loudly"
+✅ PERFECT: "trumpet sound music loud celebration"
+❌ WRONG: "announcement" (use literal trumpet)
+Speed: 1.2x FAST | Type: video | Transition: quick_cut
+
 CRITICAL RULES:
-1. Focus on ACTIONS and VERBS from narration
-   - "extends his hand" → "hand reaching out gesture"
-   - "speaking to crowd" → "person speaking audience"
-   - NOT generic terms like "forgiveness" or "jesus"
-
-2. Focus on SPECIFIC OBJECTS/SYMBOLS mentioned
-   - "open Bible" → "bible book open pages"
-   - "sunrise over hills" → "sunrise mountain landscape"
-   
-3. Focus on EMOTIONS if mentioned
-   - "feeling peace" → "peaceful person calm serene"
-   - "joy and celebration" → "people celebrating happy joyful"
-
-4. Determine best media type:
-   - Use "video" for: actions, movement, people doing things
-   - Use "photo" for: static objects, landscapes, symbolic imagery
-   
-5. Determine playback speed:
-   - 0.5-0.7: Slow motion for dramatic, peaceful, contemplative moments
-   - 1.0: Normal for standard narration
-   - 1.2-1.5: Faster for exciting, energetic, action moments
-   
-6. Determine transition type:
-   - "crossfade": Smooth, peaceful transitions
-   - "zoom": Emphasis, drawing attention
-   - "quick_cut": Fast-paced, exciting content
-   - "fade_black": Dramatic pause between major ideas
-
-7. ENSURE VARIETY: Never use the same search twice
+1. Focus on PHYSICAL ACTIONS & VERBS (reaching, walking, crying, smiling, kneeling)
+2. Use SPECIFIC OBJECTS when mentioned (hand, face, cross, bible, phone)
+3. Include EMOTIONS with actions ("smiling feeling empty", "crying tears")
+4. AVOID abstract concepts (forgiveness, hope, heaven) - use CONCRETE visuals
+5. AVOID religious figure names - use actions/symbols instead
+6. Keep queries 3-5 words MAX
+7. Determine best media type:
+   - "video" for: actions, movement, people doing things
+   - "photo" for: static objects only
+8. Determine playback speed:
+   - 0.5-0.7: Slow motion (dramatic, peaceful, contemplative, emotional)
+   - 1.0: Normal (standard narration)
+   - 1.2-1.5: Fast (exciting, energetic, action, celebration)
+9. Determine transition:
+   - "crossfade": Smooth, peaceful, standard
+   - "zoom": Emphasis, important moments
+   - "quick_cut": Fast-paced, exciting, energetic
+   - "fade_black": Dramatic pause, major topic shift
+10. ENSURE VARIETY: Never repeat searches
 
 RESPOND IN THIS EXACT JSON FORMAT:
 {{
